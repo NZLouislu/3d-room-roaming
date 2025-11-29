@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
+import '@testing-library/jest-dom';
 import App from './App';
 
 // Mock ResizeObserver
@@ -36,14 +37,38 @@ vi.mock('./components/ui/Interface', () => ({
   Interface: () => <div>Interface Mock</div>,
 }));
 
-vi.mock('./components/3d/Experience', () => ({
-  Experience: () => <div>Experience Mock</div>,
+vi.mock('./components/3d/ExperienceImproved', () => ({
+  ExperienceImproved: () => <div>ExperienceImproved Mock</div>,
+}));
+
+vi.mock('./components/ui/RealEstateWelcome', () => ({
+  RealEstateWelcome: () => <div>RealEstateWelcome Mock</div>,
+}));
+
+vi.mock('./components/ui/ViewModeToggle', () => ({
+  ViewModeToggle: () => <div>ViewModeToggle Mock</div>,
+}));
+
+vi.mock('./components/3d/AutoTourController', () => ({
+  AutoTourController: () => <div>AutoTourController Mock</div>,
+  TourUI: () => <div>TourUI Mock</div>,
+}));
+
+vi.mock('./components/ui/ViewpointSelector', () => ({
+  ViewpointSelector: () => <div>ViewpointSelector Mock</div>,
+}));
+
+vi.mock('./components/ui/PropertyInfoOverlay', () => ({
+  PropertyInfoOverlay: () => <div>PropertyInfoOverlay Mock</div>,
+}));
+
+vi.mock('./data/tourPoints', () => ({
+  DOUBLE_FLOOR_HOUSE_TOUR: [],
 }));
 
 describe('App', () => {
-  it('renders the Canvas and Interface', () => {
+  it('renders the welcome screen initially', () => {
     render(<App />);
-    expect(screen.getByText(/Canvas Mock/i)).toBeInTheDocument();
-    // Interface might be empty initially, so we check for Canvas
+    expect(screen.getByText(/RealEstateWelcome Mock/i)).toBeInTheDocument();
   });
 });
