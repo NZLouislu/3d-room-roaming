@@ -1,11 +1,11 @@
 import { Player } from './Player';
-import { Room } from './Room';
 import { Furniture } from './Furniture';
 import { Lighting } from './Lighting';
 import { Environment } from './Environment';
 import { Ground } from './Ground';
 import { ModelManager } from './models/ModelManager';
 import { Garden } from './garden/Garden';
+import { TwoStoryHouseWithPhysics } from './models/TwoStoryHouseWithPhysics';
 import { roomLayout } from '../../data/roomLayout';
 import { useStore } from '../../hooks/useStore';
 
@@ -19,7 +19,7 @@ export const Experience = () => {
       <Ground />
       <ModelManager>
         <Player />
-        <Room />
+        <TwoStoryHouseWithPhysics />
         <Garden />
         {roomLayout.livingRoom.furniture.map((item) => (
           <Furniture

@@ -9,10 +9,10 @@ export const Trees = ({ count = 50 }: TreesProps) => {
   const positions = useMemo(() => {
     const pos = [];
     for (let i = 0; i < count; i++) {
-      const x = (Math.random() - 0.5) * 40;
-      const z = (Math.random() - 0.5) * 40;
+      const x = (Math.random() - 0.5) * 80;
+      const z = (Math.random() - 0.5) * 80;
       
-      if (Math.abs(x) < 8 && Math.abs(z) < 8) {
+      if (Math.abs(x) < 15 && Math.abs(z) < 15) {
         continue;
       }
 

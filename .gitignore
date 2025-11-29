@@ -8,6 +8,9 @@ dist-ssr/
 
 # Tasks folder (contains Chinese documentation)
 tasks/
+model/
+docs/
+images/
 
 # IDE and tools
 .qodo/

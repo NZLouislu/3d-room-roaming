@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { RigidBody, CapsuleCollider, RapierRigidBody } from '@react-three/rapier';
 import { PointerLockControls } from '@react-three/drei';
@@ -15,10 +15,13 @@ export const Player = () => {
   const { camera } = useThree();
   const { forward, backward, left, right } = useKeyboard();
 
+  useEffect(() => {
+    camera.rotation.set(0, Math.PI, 0);
+  }, [camera]);
+
   useFrame(() => {
     if (!rigidBodyRef.current) return;
 
-    // Calculate movement direction
     frontVector.set(0, 0, Number(backward) - Number(forward));
     sideVector.set(Number(left) - Number(right), 0, 0);
     direction
@@ -27,11 +30,9 @@ export const Player = () => {
       .multiplyScalar(SPEED)
       .applyEuler(camera.rotation);
 
-    // Apply velocity (keep Y velocity for gravity)
     const linvel = rigidBodyRef.current.linvel();
     rigidBodyRef.current.setLinvel({ x: direction.x, y: linvel.y, z: direction.z }, true);
 
-    // Sync camera to player position
     const translation = rigidBodyRef.current.translation();
     camera.position.set(translation.x, translation.y + 1.5, translation.z);
   });
@@ -42,7 +43,7 @@ export const Player = () => {
       colliders={false}
       mass={1}
       type="dynamic"
-      position={[0, 2, 0]}
+      position={[0, 2, 5]}
       enabledRotations={[false, false, false]}
       lockRotations
     >
