@@ -15,6 +15,10 @@ import { DOUBLE_FLOOR_HOUSE_TOUR } from './data/tourPoints';
 import { Navbar } from './components/ui/Navbar';
 import { CoordinatesPanel } from './components/ui/CoordinatesPanel';
 import { BirdViewControls } from './components/3d/BirdViewControls';
+import { PerformanceMonitor } from './components/3d/PerformanceMonitor';
+import { PerformanceHUD } from './components/ui/PerformanceHUD';
+import { detectRendererCapabilities, getRendererConfig } from './utils/rendererDetection';
+import { useStore } from './hooks/useStore';
 
 type AppMode = 'welcome' | 'auto-tour' | 'free-explore' | 'bird-view';
 
@@ -61,6 +65,20 @@ function AppImproved() {
     pos: [0, 50, 0], 
     target: [0, 0, 0] 
   });
+
+  const [rendererReady, setRendererReady] = useState(false);
+  const setRendererType = useStore((state) => state.setRendererType);
+
+  useEffect(() => {
+    detectRendererCapabilities().then((capabilities) => {
+      setRendererType(capabilities.type);
+      setRendererReady(true);
+      console.log(`Renderer initialized: ${capabilities.type}`);
+      if (capabilities.features) {
+        console.log('WebGPU features:', capabilities.features);
+      }
+    });
+  }, [setRendererType]);
 
   const handleToggleBirdView = () => {
     if (mode === 'bird-view') {
@@ -136,13 +154,30 @@ function AppImproved() {
         <RealEstateWelcome onStart={handleWelcomeChoice} />
       )}
 
-      <Canvas 
-        shadows 
-        camera={{ 
-          fov: 45, 
-          position: mode === 'auto-tour' ? [0, 28, -40] : [0, 12, 30] 
-        }}
-      >
+      {rendererReady && (
+        <Canvas 
+          shadows 
+          camera={{ 
+            fov: 45, 
+            position: mode === 'auto-tour' ? [0, 28, -40] : [0, 12, 30] 
+          }}
+          gl={(canvas) => {
+            const rendererType = useStore.getState().rendererType;
+            const config = getRendererConfig(rendererType);
+            
+            const renderer = new THREE.WebGLRenderer({
+              canvas,
+              ...config,
+            });
+            
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1;
+            
+            return renderer;
+          }}
+        >
         <Sky sunPosition={[100, 20, 100]} />
         <ambientLight intensity={0.6} />
         <directionalLight
@@ -162,6 +197,8 @@ function AppImproved() {
           isActive={mode === 'bird-view'}
           onUpdate={handleBirdViewUpdate}
         />
+        
+        <PerformanceMonitor />
 
         {tourEnabled && (
           <AutoTourController
@@ -181,7 +218,10 @@ function AppImproved() {
         
         {mode === 'free-explore' && <ViewpointSelector />}
         <CameraPositionLogger />
-      </Canvas>
+        </Canvas>
+      )}
+
+      <PerformanceHUD />
 
       {debugMode && tourEnabled && (
         <TourDebugPanel
