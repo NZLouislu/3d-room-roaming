@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Vector3, Box3 } from 'three';
+import { Vector3 } from 'three';
+import { useEffect, useState } from 'react';
 import { TourPoint } from '../../data/tourPoints';
 
 interface AutoTourControllerProps {
@@ -12,9 +12,11 @@ interface AutoTourControllerProps {
   setProgress: (fn: (p: number) => number) => void;
   isPaused: boolean;
   onComplete: () => void;
+  customPosition?: [number, number, number];
+  customLookAt?: [number, number, number];
+  onPositionChange?: (pos: [number, number, number]) => void;
 }
 
-// 3D 场景内的相机控制器
 export function AutoTourController({ 
   tourPoints, 
   enabled, 
@@ -23,43 +25,89 @@ export function AutoTourController({
   progress,
   setProgress,
   isPaused,
-  onComplete 
+  onComplete,
+  customPosition,
+  customLookAt,
+  onPositionChange
 }: AutoTourControllerProps) {
-  const { camera, scene } = useThree();
-  const hasLoggedRef = useRef(false);
+  const { camera } = useThree();
+  const [keys, setKeys] = useState<Set<string>>(new Set());
   
   const currentPoint = tourPoints[currentIndex];
 
-  // 调试：打印场景中房子的实际位置
   useEffect(() => {
-    if (enabled && !hasLoggedRef.current) {
-      hasLoggedRef.current = true;
-      
-      console.log('[AutoTour] Scene children:', scene.children.map(c => ({ name: c.name, type: c.type, position: c.position.toArray() })));
-      
-      const box = new Box3().setFromObject(scene);
-      const center = box.getCenter(new Vector3());
-      const size = box.getSize(new Vector3());
-      console.log('[AutoTour] Scene bounding box - center:', center.toArray(), 'size:', size.toArray());
-      console.log('[AutoTour] Scene box min:', box.min.toArray(), 'max:', box.max.toArray());
-    }
-  }, [enabled, scene]);
-  
-  useFrame((_state, delta) => {
-    if (!enabled || isPaused || !currentPoint) return;
-    
-    const targetPos = new Vector3(...currentPoint.position);
-    const targetLookAt = new Vector3(...currentPoint.lookAt);
-    
-    camera.position.lerp(targetPos, delta * 1.5);
-    camera.lookAt(targetLookAt);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      setKeys(prev => new Set(prev).add(e.key.toLowerCase()));
+    };
 
+    const handleKeyUp = (e: KeyboardEvent) => {
+      setKeys(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(e.key.toLowerCase());
+        return newSet;
+      });
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
+  useFrame((_state, delta) => {
+    if (!enabled || !currentPoint) return;
+
+    if (isPaused) {
+      const moveSpeed = keys.has('shift') ? 2.0 : 0.5;
+      const movement = new Vector3();
+
+      if (keys.has('w')) movement.z += moveSpeed * delta;
+      if (keys.has('s')) movement.z -= moveSpeed * delta;
+      if (keys.has('a')) movement.x -= moveSpeed * delta;
+      if (keys.has('d')) movement.x += moveSpeed * delta;
+      if (keys.has('q')) movement.y += moveSpeed * delta;
+      if (keys.has('e')) movement.y -= moveSpeed * delta;
+
+      if (movement.length() > 0) {
+        camera.position.add(movement);
+        
+        if (onPositionChange) {
+          onPositionChange([
+            camera.position.x,
+            camera.position.y,
+            camera.position.z
+          ]);
+        }
+      }
+
+      const targetLookAt = customLookAt 
+        ? new Vector3(...customLookAt)
+        : new Vector3(...currentPoint.lookAt);
+      camera.lookAt(targetLookAt);
+
+      return;
+    }
+    
+    const targetPos = customPosition 
+      ? new Vector3(...customPosition)
+      : new Vector3(...currentPoint.position);
+    const targetLookAt = customLookAt 
+      ? new Vector3(...customLookAt)
+      : new Vector3(...currentPoint.lookAt);
+    
+    camera.position.lerp(targetPos, delta * 2.5);
+    camera.lookAt(targetLookAt);
+    
     if (Math.floor(progress) !== Math.floor(progress + delta)) {
-      console.log(`[AutoTour] Point ${currentIndex + 1}/${tourPoints.length} - Camera pos:`, 
-        camera.position.toArray().map(v => v.toFixed(2)), 
-        'Target:', targetPos.toArray(),
-        'LookAt:', targetLookAt.toArray()
-      );
+      const dist = camera.position.distanceTo(targetPos);
+      console.log(`[AutoTour Debug] View #${currentPoint.id}: ${currentPoint.title}`);
+      console.log(`  - Camera Pos: [${camera.position.x.toFixed(2)}, ${camera.position.y.toFixed(2)}, ${camera.position.z.toFixed(2)}]`);
+      console.log(`  - Target Pos: [${targetPos.x.toFixed(2)}, ${targetPos.y.toFixed(2)}, ${targetPos.z.toFixed(2)}]`);
+      console.log(`  - LookAt: [${targetLookAt.x.toFixed(2)}, ${targetLookAt.y.toFixed(2)}, ${targetLookAt.z.toFixed(2)}]`);
+      console.log(`  - Distance to Target: ${dist.toFixed(2)}`);
     }
     
     setProgress(prev => {
@@ -80,7 +128,6 @@ export function AutoTourController({
   return null;
 }
 
-// UI 组件 - 在 Canvas 外部使用
 interface TourUIProps {
   tourPoints: TourPoint[];
   currentIndex: number;
@@ -130,33 +177,48 @@ export function TourUI({
           />
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2">
           <button
             onClick={() => setIsPaused(!isPaused)}
-            className="flex-1 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition"
+            className="w-full px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition"
           >
-            {isPaused ? '▶️ 继续' : '⏸️ 暂停'}
+            {isPaused ? '▶️ Resume' : '⏸️ Pause'}
           </button>
           
-          <button
-            onClick={() => {
-              if (currentIndex < tourPoints.length - 1) {
-                setCurrentIndex(i => i + 1);
-                setProgress(0);
-              }
-            }}
-            className="flex-1 px-3 py-2 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 transition"
-            disabled={currentIndex >= tourPoints.length - 1}
-          >
-            ⏭️ 下一个
-          </button>
-          
-          <button
-            onClick={onComplete}
-            className="flex-1 px-3 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition"
-          >
-            ⏹️ 跳过
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                if (currentIndex > 0) {
+                  setCurrentIndex(i => i - 1);
+                  setProgress(0);
+                }
+              }}
+              className="flex-1 px-3 py-2 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={currentIndex <= 0}
+            >
+              ⏮️ Previous
+            </button>
+            
+            <button
+              onClick={() => {
+                if (currentIndex < tourPoints.length - 1) {
+                  setCurrentIndex(i => i + 1);
+                  setProgress(0);
+                }
+              }}
+              className="flex-1 px-3 py-2 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={currentIndex >= tourPoints.length - 1}
+            >
+              ⏭️ Next
+            </button>
+            
+            <button
+              onClick={onComplete}
+              className="flex-1 px-3 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition"
+            >
+              ⏹️ Skip
+            </button>
+          </div>
         </div>
       </div>
     </div>

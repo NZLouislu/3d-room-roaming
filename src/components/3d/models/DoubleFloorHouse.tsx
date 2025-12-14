@@ -30,7 +30,6 @@ export function DoubleFloorHouse(props: JSX.IntrinsicElements['group']) {
 
 useGLTF.preload('/models/two-story-house.glb');
 
-// 带物理碰撞的版本
 function DoubleFloorHouseInner(props: JSX.IntrinsicElements['group']) {
   const { scene } = useGLTF('/models/two-story-house.glb');
 
@@ -43,11 +42,8 @@ function DoubleFloorHouseInner(props: JSX.IntrinsicElements['group']) {
     }
   }, [scene]);
 
-  // 房子模型原始中心在 [-146, -14, -138]
-  // 偏移后中心在 [0, 20, 0]，尺寸 [54, 40, 35]
-  // 需要让底部在地面 y=0，所以 Y 偏移应该是 14.11（让中心在 y=20 左右）
   const offsetX = 146.65;
-  const offsetY = 14.11; // 只补偿原始的Y偏移，不要额外加高度
+  const offsetY = 14.11;
   const offsetZ = 138.17;
   
   return (

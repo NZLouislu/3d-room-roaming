@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 interface WelcomeProps {
-  onStart: (mode: 'auto-tour' | 'free-explore') => void;
+  onStart: (mode: 'auto-tour' | 'free-explore' | 'bird-view') => void;
 }
 
 export function RealEstateWelcome({ onStart }: WelcomeProps) {
@@ -9,7 +9,7 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
   
   if (!visible) return null;
   
-  const handleStart = (mode: 'auto-tour' | 'free-explore') => {
+  const handleStart = (mode: 'auto-tour' | 'free-explore' | 'bird-view') => {
     setVisible(false);
     onStart(mode);
   };
@@ -28,7 +28,7 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
         </div>
         
         <div className="p-8">
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
             
             <button
               onClick={() => handleStart('auto-tour')}
@@ -69,6 +69,27 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
               </ul>
               <div className="mt-4 inline-block bg-green-600 text-white px-6 py-2 rounded-full group-hover:bg-green-700 transition">
                 Start Exploring →
+              </div>
+            </button>
+
+            <button
+              onClick={() => handleStart('bird-view')}
+              className="group relative overflow-hidden rounded-2xl border-2 border-purple-200 hover:border-purple-500 transition-all duration-300 p-8 text-left bg-gradient-to-br from-purple-50 to-fuchsia-50 hover:shadow-xl"
+            >
+              <div className="text-6xl mb-4">🦅</div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                Bird View
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Get a complete overhead perspective of the entire property layout
+              </p>
+              <ul className="text-sm text-gray-500 space-y-1">
+                <li>✓ Top-down perspective</li>
+                <li>✓ Record room coordinates</li>
+                <li>✓ Understand layout structure</li>
+              </ul>
+              <div className="mt-4 inline-block bg-purple-600 text-white px-6 py-2 rounded-full group-hover:bg-purple-700 transition">
+                Start View →
               </div>
             </button>
             

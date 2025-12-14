@@ -1,7 +1,8 @@
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import { Sky } from '@react-three/drei';
 import { Physics } from '@react-three/rapier';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import * as THREE from 'three';
 import { ExperienceImproved } from './components/3d/ExperienceImproved';
 import { Interface } from './components/ui/Interface';
 import { ViewModeToggle } from './components/ui/ViewModeToggle';
@@ -9,37 +10,128 @@ import { RealEstateWelcome } from './components/ui/RealEstateWelcome';
 import { AutoTourController, TourUI } from './components/3d/AutoTourController';
 import { ViewpointSelector } from './components/ui/ViewpointSelector';
 import { PropertyInfoOverlay } from './components/ui/PropertyInfoOverlay';
+import { TourDebugPanel } from './components/ui/TourDebugPanel';
 import { DOUBLE_FLOOR_HOUSE_TOUR } from './data/tourPoints';
+import { Navbar } from './components/ui/Navbar';
+import { CoordinatesPanel } from './components/ui/CoordinatesPanel';
+import { BirdViewControls } from './components/3d/BirdViewControls';
 
-type AppMode = 'welcome' | 'auto-tour' | 'free-explore';
+type AppMode = 'welcome' | 'auto-tour' | 'free-explore' | 'bird-view';
+
+function CameraPositionLogger() {
+  const { camera } = useThree();
+
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === 'p' || e.key === 'P') {
+        console.log('=== Current Camera Position ===');
+        console.log(`Position: [${camera.position.x.toFixed(2)}, ${camera.position.y.toFixed(2)}, ${camera.position.z.toFixed(2)}]`);
+        console.log(`Rotation: [${camera.rotation.x.toFixed(2)}, ${camera.rotation.y.toFixed(2)}, ${camera.rotation.z.toFixed(2)}]`);
+        
+        const direction = new THREE.Vector3();
+        camera.getWorldDirection(direction);
+        const lookAt = camera.position.clone().add(direction.multiplyScalar(10));
+        console.log(`LookAt (estimated): [${lookAt.x.toFixed(2)}, ${lookAt.y.toFixed(2)}, ${lookAt.z.toFixed(2)}]`);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [camera]);
+
+  return null;
+}
 
 function AppImproved() {
   const [viewMode, setViewMode] = useState<'first-person' | 'third-person'>('third-person');
   const [mode, setMode] = useState<AppMode>('welcome');
   const [tourEnabled, setTourEnabled] = useState(false);
   
-  // Tour 状态
   const [tourIndex, setTourIndex] = useState(0);
   const [tourProgress, setTourProgress] = useState(0);
   const [tourPaused, setTourPaused] = useState(false);
 
-  const handleWelcomeChoice = (choice: 'auto-tour' | 'free-explore') => {
+  const [debugMode, setDebugMode] = useState(false);
+  const [customPosition, setCustomPosition] = useState<[number, number, number] | undefined>();
+  const [customLookAt, setCustomLookAt] = useState<[number, number, number] | undefined>();
+
+  const [currentCameraPos, setCurrentCameraPos] = useState<[number, number, number]>([0, 28, -40]);
+  
+  const [birdViewCoords, setBirdViewCoords] = useState<{pos: [number, number, number], target: [number, number, number]}>({ 
+    pos: [0, 50, 0], 
+    target: [0, 0, 0] 
+  });
+
+  const handleToggleBirdView = () => {
+    if (mode === 'bird-view') {
+      setMode('free-explore');
+    } else {
+      setMode('bird-view');
+      setTourEnabled(false);
+    }
+  };
+
+  const handleBirdViewUpdate = (pos: [number, number, number], target: [number, number, number]) => {
+    setBirdViewCoords({ pos, target });
+  };
+
+  const handleWelcomeChoice = (choice: 'auto-tour' | 'free-explore' | 'bird-view') => {
     setMode(choice);
     if (choice === 'auto-tour') {
       setTourEnabled(true);
       setTourIndex(0);
       setTourProgress(0);
       setTourPaused(false);
+      setDebugMode(true);
     }
   };
 
   const handleTourComplete = () => {
     setMode('free-explore');
     setTourEnabled(false);
+    setDebugMode(false);
+  };
+
+  const handleSelectView = (index: number) => {
+    setTourIndex(index);
+    setTourProgress(0);
+    setCustomPosition(undefined);
+    setCustomLookAt(undefined);
+  };
+
+  const handleApplyChanges = () => {
+    console.log('Applied custom position:', customPosition);
+    console.log('Applied custom lookAt:', customLookAt);
+  };
+
+  const getCurrentPosition = (): [number, number, number] => {
+    if (customPosition) return customPosition;
+    if (tourEnabled && DOUBLE_FLOOR_HOUSE_TOUR[tourIndex]) {
+      return DOUBLE_FLOOR_HOUSE_TOUR[tourIndex].position;
+    }
+    return currentCameraPos;
+  };
+
+  const getCurrentLookAt = (): [number, number, number] => {
+    if (customLookAt) return customLookAt;
+    if (tourEnabled && DOUBLE_FLOOR_HOUSE_TOUR[tourIndex]) {
+      return DOUBLE_FLOOR_HOUSE_TOUR[tourIndex].lookAt;
+    }
+    return [0, 0, 0];
   };
 
   return (
     <>
+      <Navbar isBirdView={mode === 'bird-view'} onToggleBirdView={handleToggleBirdView} />
+      
+      {mode === 'bird-view' && (
+        <CoordinatesPanel 
+          visible={true}
+          position={birdViewCoords.pos}
+          target={birdViewCoords.target}
+        />
+      )}
+
       {mode === 'welcome' && (
         <RealEstateWelcome onStart={handleWelcomeChoice} />
       )}
@@ -48,7 +140,7 @@ function AppImproved() {
         shadows 
         camera={{ 
           fov: 45, 
-          position: mode === 'auto-tour' ? [50, 30, 50] : [0, 12, 30] 
+          position: mode === 'auto-tour' ? [0, 28, -40] : [0, 12, 30] 
         }}
       >
         <Sky sunPosition={[100, 20, 100]} />
@@ -60,8 +152,16 @@ function AppImproved() {
           shadow-mapSize={[2048, 2048]}
         />
         <Physics debug={false}>
-          <ExperienceImproved viewMode={viewMode} enablePlayer={mode !== 'auto-tour'} />
+          <ExperienceImproved 
+            viewMode={viewMode} 
+            enablePlayer={mode !== 'auto-tour' && mode !== 'bird-view'} 
+          />
         </Physics>
+        
+        <BirdViewControls 
+          isActive={mode === 'bird-view'}
+          onUpdate={handleBirdViewUpdate}
+        />
 
         {tourEnabled && (
           <AutoTourController
@@ -73,14 +173,32 @@ function AppImproved() {
             setProgress={setTourProgress}
             isPaused={tourPaused}
             onComplete={handleTourComplete}
+            customPosition={customPosition}
+            customLookAt={customLookAt}
+            onPositionChange={setCurrentCameraPos}
           />
         )}
         
         {mode === 'free-explore' && <ViewpointSelector />}
+        <CameraPositionLogger />
       </Canvas>
 
-      {/* Tour UI - 在 Canvas 外部 */}
-      {tourEnabled && (
+      {debugMode && tourEnabled && (
+        <TourDebugPanel
+          tourPoints={DOUBLE_FLOOR_HOUSE_TOUR}
+          currentIndex={tourIndex}
+          onSelectView={handleSelectView}
+          isPaused={tourPaused}
+          onTogglePause={() => setTourPaused(!tourPaused)}
+          currentPosition={getCurrentPosition()}
+          currentLookAt={getCurrentLookAt()}
+          onUpdatePosition={setCustomPosition}
+          onUpdateLookAt={setCustomLookAt}
+          onApplyChanges={handleApplyChanges}
+        />
+      )}
+
+      {tourEnabled && !debugMode && (
         <TourUI
           tourPoints={DOUBLE_FLOOR_HOUSE_TOUR}
           currentIndex={tourIndex}
@@ -103,12 +221,13 @@ function AppImproved() {
 
       {mode !== 'welcome' && (
         <div className="fixed bottom-4 right-4 bg-black/70 text-white px-4 py-3 rounded-lg text-sm backdrop-blur-sm z-20">
-          <div className="font-bold mb-2">操作说明</div>
+          <div className="font-bold mb-2">Controls</div>
           <ul className="space-y-1 text-xs">
-            <li>右键拖动旋转视角</li>
-            <li>WASD 移动</li>
-            <li>Shift 跑步</li>
-            {mode === 'free-explore' && <li>📍 快捷视角 (左侧面板)</li>}
+            <li>Right-click drag to rotate view</li>
+            <li>WASD to move</li>
+            <li>Shift to run</li>
+            {mode === 'free-explore' && <li>📍 Quick viewpoints (left panel)</li>}
+            {tourEnabled && tourPaused && <li>🔧 WASD/QE to fine-tune position</li>}
           </ul>
         </div>
       )}

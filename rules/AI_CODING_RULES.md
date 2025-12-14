@@ -548,6 +548,77 @@ If rules conflict, follow this priority:
 4. Is this documentation in the right folder?
 5. Would another developer understand this without comments?
 
+**These rules are MANDATORY for all AI-generated code and documentation in this project.**
+
 ---
 
-**These rules are MANDATORY for all AI-generated code and documentation in this project.**
+## 🏠 3D Tour Debug Panel
+
+### Overview
+
+The 3D Room Roaming application includes a comprehensive debug panel for the automatic tour feature. This panel allows developers to:
+
+1. **Select and preview any tour view** from a dropdown menu
+2. **View real-time camera coordinates** (position and lookAt)
+3. **Edit coordinates** and see changes immediately
+4. **Fine-tune camera position** using WASD+QE keyboard controls
+5. **Copy tour point code** to clipboard for easy updates
+
+### Debug Panel Features
+
+#### 1. View Selection
+
+- Dropdown menu showing all tour points (Welcome, Backyard, Living Room, etc.)
+- Selecting a view immediately jumps to that position
+- Shows current view number and total count
+
+#### 2. Coordinate Display & Editing
+
+- **Position (X, Y, Z)**: Camera location in 3D space
+- **Look At (X, Y, Z)**: Point the camera is looking at
+- Toggle Edit Mode to modify coordinates
+- Apply Changes button to preview modifications
+
+#### 3. WASD Keyboard Controls
+
+When tour is paused, use keyboard to fine-tune position:
+
+- `W` - Move forward (+Z)
+- `S` - Move backward (-Z)
+- `A` - Move left (-X)
+- `D` - Move right (+X)
+- `Q` - Move up (+Y)
+- `E` - Move down (-Y)
+- `Shift` + Key - Faster movement (2x speed)
+
+#### 4. Code Export
+
+- Copy button generates ready-to-use TypeScript code
+- Includes all tour point properties
+- Paste directly into `tourPoints.ts`
+
+### Usage Workflow
+
+1. **Start Auto Tour** - Debug panel appears automatically
+2. **Pause Tour** - Click pause button or select a specific view
+3. **Fine-tune Position** - Use WASD+QE keys to adjust camera
+4. **Edit Coordinates** - Enable Edit Mode for precise numerical adjustments
+5. **Apply & Test** - See changes in real-time
+6. **Copy Code** - Export finalized coordinates
+
+### Technical Implementation
+
+The debug panel integrates with:
+
+- `AutoTourController` - Handles camera movement and keyboard input
+- `TourDebugPanel` - UI component for controls and coordinate editing
+- `App.tsx` - State management for debug mode and custom positions
+
+### Best Practices
+
+- Always pause before making adjustments
+- Use WASD for quick positioning, then fine-tune with numerical inputs
+- Test each view thoroughly before copying code
+- Keep debug mode enabled only during development
+
+---

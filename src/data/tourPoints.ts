@@ -1,4 +1,5 @@
 export interface TourPoint {
+  id: number;
   position: [number, number, number];
   lookAt: [number, number, number];
   duration: number;
@@ -6,97 +7,158 @@ export interface TourPoint {
   description: string;
 }
 
-// 房子尺寸约 54x40x35，中心在 [0, 0, 0]
-// 房子范围大约: X: -27 到 27, Y: -20 到 20, Z: -17 到 17
 export const DOUBLE_FLOOR_HOUSE_TOUR: TourPoint[] = [
-  // === 外部远景 ===
+  // ========== Exterior Views (1-5) ==========
   {
-    position: [50, 30, 50], // 远距离斜上方俯视
+    id: 1,
+    position: [3, 28, -35],
     lookAt: [0, 0, 0],
     duration: 3,
-    title: "欢迎来到您的梦想之家",
-    description: "这座精美的两层别墅采用现代建筑设计，配备高端装修"
+    title: "Welcome - Backyard Overview",
+    description: "Stunning aerial view of the backyard with deck, stairs, and garage"
   },
-  // === 外部环绕 ===
   {
-    position: [40, 10, 30], // 右前方近景
+    id: 2,
+    position: [12, 15, -17],
+    lookAt: [0, 12, 0],
+    duration: 4,
+    title: "Backyard Deck & Patio",
+    description: "Spacious wooden deck perfect for outdoor entertaining"
+  },
+  {
+    id: 3,
+    position: [-10, 12, -20],
+    lookAt: [0, 12, -12],
+    duration: 3,
+    title: "Outdoor Stairs",
+    description: "Elegant stairs connecting the yard to the deck area"
+  },
+  {
+    id: 4,
+    position: [-10, 12, -20],
+    lookAt: [0, 12, -10],
+    duration: 3,
+    title: "Garage Entrance",
+    description: "Convenient garage access with modern door design"
+  },
+  {
+    id: 5,
+    position: [0, 12, -10],
+    lookAt: [0, 12, -5],
+    duration: 4,
+    title: "Main Entrance Door",
+    description: "Welcoming entrance with glass panels and modern design"
+  },
+
+  // ========== First Floor Interior (6-9) - Main Living Areas ==========
+  {
+    id: 6,
+    position: [0, 16, -5],
+    lookAt: [0, 16, 5],
+    duration: 4,
+    title: "Foyer & Entry Hall",
+    description: "Bright and spacious entrance hall with natural light"
+  },
+  {
+    id: 7,
+    position: [9, 16, 5],
+    lookAt: [0, 16, 5],
+    duration: 5,
+    title: "Living Room",
+    description: "Open-concept living area with floor-to-ceiling windows"
+  },
+  {
+    id: 8,
+    position: [-5, 16, 6],
+    lookAt: [0, 16, 5],
+    duration: 4,
+    title: "Dining Area",
+    description: "Elegant dining space adjacent to the kitchen"
+  },
+  {
+    id: 9,
+    position: [8, 16, 3],
+    lookAt: [0, 16, 3],
+    duration: 5,
+    title: "Modern Kitchen",
+    description: "State-of-the-art kitchen with premium appliances and island"
+  },
+
+  // ========== Staircase (10) ==========
+  {
+    id: 10,
+    position: [0, 18, 0],
+    lookAt: [0, 20, 0],
+    duration: 3,
+    title: "Staircase to Second Floor",
+    description: "Elegant staircase with modern railing design"
+  },
+
+  // ========== Second Floor Interior (11-17) - Bedrooms & Bathrooms ==========
+  {
+    id: 11,
+    position: [0, 20, 5],
+    lookAt: [8, 20, 5],
+    duration: 3,
+    title: "Second Floor Hallway",
+    description: "Spacious hallway connecting all second floor rooms"
+  },
+  {
+    id: 12,
+    position: [10, 20, 5],
+    lookAt: [5, 20, 5],
+    duration: 5,
+    title: "Master Bedroom",
+    description: "Luxurious master suite with walk-in closet and en-suite bathroom"
+  },
+  {
+    id: 13,
+    position: [8, 20, 8],
+    lookAt: [5, 20, 8],
+    duration: 4,
+    title: "Master Bathroom",
+    description: "Spa-like master bathroom with premium finishes"
+  },
+  {
+    id: 14,
+    position: [-8, 20, 8],
+    lookAt: [-3, 20, 8],
+    duration: 4,
+    title: "Bedroom #2",
+    description: "Spacious second bedroom with great views"
+  },
+  {
+    id: 15,
+    position: [-8, 20, 3],
+    lookAt: [-3, 20, 3],
+    duration: 4,
+    title: "Bedroom #3",
+    description: "Comfortable third bedroom perfect for family or guests"
+  },
+  {
+    id: 16,
+    position: [8, 20, -3],
+    lookAt: [3, 20, -3],
+    duration: 4,
+    title: "Bedroom #4",
+    description: "Fourth bedroom with ample closet space"
+  },
+  {
+    id: 17,
+    position: [-8, 20, -3],
+    lookAt: [-3, 20, -3],
+    duration: 3,
+    title: "Second Floor Bathroom",
+    description: "Full bathroom serving bedrooms 2, 3, and 4"
+  },
+
+  // ========== Final View (18) ==========
+  {
+    id: 18,
+    position: [40, 30, 40],
     lookAt: [0, 0, 0],
-    duration: 3,
-    title: "正面外观",
-    description: "优雅的砖石外墙和大面积落地窗，提供充足的自然采光"
-  },
-  {
-    position: [-40, 10, 25], // 左前方
-    lookAt: [0, 0, 0],
-    duration: 3,
-    title: "侧面花园",
-    description: "宽敞的侧院和精心设计的花园区域"
-  },
-  {
-    position: [0, 15, -40], // 后方
-    lookAt: [0, 0, 0],
-    duration: 3,
-    title: "后院景观",
-    description: "美丽的后花园，配有露台和户外休闲区"
-  },
-  // === 靠近入口 ===
-  {
-    position: [10, -10, 25], // 靠近正门（一楼高度约 y=-10）
-    lookAt: [0, -10, 0],
-    duration: 3,
-    title: "主入口",
-    description: "宽敞的入口门廊，彰显尊贵气质"
-  },
-  // === 进入室内一楼 (y 约 -15 到 -5) ===
-  {
-    position: [0, -12, 8], // 进入门厅
-    lookAt: [0, -12, -5],
-    duration: 3,
-    title: "门厅",
-    description: "步入宽敞明亮的门厅，感受家的温馨"
-  },
-  {
-    position: [0, -12, 0], // 一楼中央
-    lookAt: [-10, -12, 0],
-    duration: 3,
-    title: "一楼客厅",
-    description: "开放式客厅设计，采光充足，视野开阔"
-  },
-  {
-    position: [-5, -12, -5], // 一楼左侧
-    lookAt: [5, -12, -8],
-    duration: 3,
-    title: "餐厅区域",
-    description: "精致的餐厅空间，适合家庭聚餐"
-  },
-  // === 上楼到二楼 (y 约 5 到 15) ===
-  {
-    position: [3, 5, 0], // 楼梯位置
-    lookAt: [0, 10, -5],
-    duration: 3,
-    title: "楼梯间",
-    description: "优雅的楼梯设计，连接上下两层"
-  },
-  {
-    position: [0, 8, 0], // 二楼中央
-    lookAt: [10, 8, 0],
-    duration: 3,
-    title: "二楼走廊",
-    description: "宽敞的二楼走廊，通往各个卧室"
-  },
-  {
-    position: [8, 8, 5], // 主卧方向
-    lookAt: [15, 8, 8],
-    duration: 3,
-    title: "主卧室",
-    description: "豪华主卧套房，配有独立卫浴和衣帽间"
-  },
-  // === 返回外部俯视 ===
-  {
-    position: [50, 35, 50], // 高空俯视结束
-    lookAt: [0, 0, 0],
-    duration: 3,
-    title: "鸟瞰全景",
-    description: "Tour 结束！您现在可以使用 WASD 键自由探索"
+    duration: 4,
+    title: "Final Overview",
+    description: "Complete view of your dream home. Tour complete - explore freely!"
   }
 ];
