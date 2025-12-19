@@ -108,7 +108,7 @@ export function AutoTourController({
       camera.rotation.y = rotationRef.current.yaw;
       camera.rotation.x = rotationRef.current.pitch;
 
-      const forward = new Vector3(0, 0, 1);
+      const forward = new Vector3(0, 0, -1);
       const right = new Vector3(1, 0, 0);
       
       forward.applyEuler(new Euler(0, rotationRef.current.yaw, 0, 'YXZ'));
