@@ -14,22 +14,27 @@ export const ViewModeToggle = ({ onModeChange }: ViewModeToggleProps) => {
   };
 
   return (
-    <div className="fixed top-4 left-4 z-10">
-      <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-4 border border-gray-200">
-        <div className="flex items-center gap-3">
+    <div className="fixed top-16 sm:top-20 left-4 z-10">
+      <div className="bg-white/90 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-lg p-2 sm:p-4 border border-gray-200">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={toggleMode}
-            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors font-medium flex items-center gap-2"
+            className="px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-xs sm:text-sm font-medium flex items-center gap-1 sm:gap-2 whitespace-nowrap"
           >
             <span>{mode === 'first-person' ? '👤' : '🎮'}</span>
-            <span>{mode === 'first-person' ? 'First Person' : 'Third Person'}</span>
+            <span>{mode === 'first-person' ? '1st Person' : '3rd Person'}</span>
           </button>
           
-          <div className="text-sm text-gray-600 border-l border-gray-300 pl-3">
-            <div className="flex flex-col gap-1">
-              <div><kbd className="px-2 py-1 bg-gray-100 rounded text-xs">WASD</kbd> Move</div>
-              <div><kbd className="px-2 py-1 bg-gray-100 rounded text-xs">Shift</kbd> Run</div>
-              <div><kbd className="px-2 py-1 bg-gray-100 rounded text-xs">Right-drag</kbd> Rotate view</div>
+          <div className="hidden md:block text-sm text-gray-600 border-l border-gray-300 pl-3">
+            <div className="flex flex-col gap-0.5">
+              <div className="flex items-center gap-2">
+                <kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-[10px]">WASD</kbd> 
+                <span className="text-xs">Move</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-[10px]">Shift</kbd> 
+                <span className="text-xs">Run</span>
+              </div>
             </div>
           </div>
         </div>

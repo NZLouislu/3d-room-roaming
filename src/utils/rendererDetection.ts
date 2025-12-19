@@ -12,6 +12,7 @@ function getPerformanceTier(): PerformanceTier {
   if (typeof navigator === 'undefined') return 'medium';
 
   const cores = navigator.hardwareConcurrency || 4;
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   
   // Try to get GPU info via WebGL
   const canvas = document.createElement('canvas');
@@ -46,7 +47,10 @@ function getPerformanceTier(): PerformanceTier {
     renderer.includes('hd graphics') ||
     renderer.includes('swiftshader') ||
     renderer.includes('software') ||
-    cores <= 4
+    renderer.includes('mali') ||
+    renderer.includes('adreno') ||
+    cores <= 4 ||
+    (isMobile && !renderer.includes('apple')) // Most mobiles are low/medium unless they are Apple Silicon
   ) {
     return 'low';
   }

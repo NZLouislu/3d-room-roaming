@@ -158,7 +158,7 @@ function AppImproved() {
       {rendererReady && (
         <Canvas 
           shadows={performanceTier !== 'low'}
-          dpr={performanceTier === 'low' ? [1, 1] : [1, 2]}
+          dpr={performanceTier === 'low' ? 0.75 : [1, 2]}
           camera={{ 
             fov: 45, 
             position: mode === 'auto-tour' ? [0, 28, -40] : [0, 12, 30] 

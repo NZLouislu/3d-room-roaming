@@ -2,6 +2,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Vector3, Euler } from 'three';
 import { useEffect, useState, useRef } from 'react';
 import { TourPoint } from '../../data/tourPoints';
+import { useStore } from '../../hooks/useStore';
 
 interface AutoTourControllerProps {
   tourPoints: TourPoint[];
@@ -31,9 +32,10 @@ export function AutoTourController({
   onPositionChange
 }: AutoTourControllerProps) {
   const { camera, gl } = useThree();
-  const [keys, setKeys] = useState<Set<string>>(new Set());
+  const keysRef = useRef<Set<string>>(new Set());
   const [isMouseDown, setIsMouseDown] = useState(false);
   const rotationRef = useRef({ yaw: 0, pitch: 0 });
+  const performanceTier = useStore((state) => state.performanceTier);
   
   const currentPoint = tourPoints[currentIndex];
 
@@ -41,19 +43,15 @@ export function AutoTourController({
     const canvas = gl.domElement;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      setKeys(prev => new Set(prev).add(e.key.toLowerCase()));
+      keysRef.current.add(e.key.toLowerCase());
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      setKeys(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(e.key.toLowerCase());
-        return newSet;
-      });
+      keysRef.current.delete(e.key.toLowerCase());
     };
 
     const handleMouseDown = (e: MouseEvent) => {
-      if (e.button === 0) {
+      if (e.button === 0 && isPaused) {
         setIsMouseDown(true);
         canvas.requestPointerLock();
       }
@@ -62,17 +60,18 @@ export function AutoTourController({
     const handleMouseUp = (e: MouseEvent) => {
       if (e.button === 0) {
         setIsMouseDown(false);
-        document.exitPointerLock();
+        if (document.pointerLockElement === canvas) {
+          document.exitPointerLock();
+        }
       }
     };
 
     const handleMouseMove = (e: MouseEvent) => {
       if (!isPaused || !isMouseDown) return;
 
-      const sensitivity = 0.002;
-      // Flip signs for more intuitive drag-to-look behavior
-      rotationRef.current.yaw += e.movementX * sensitivity;
-      rotationRef.current.pitch += e.movementY * sensitivity;
+      const sensitivity = performanceTier === 'low' ? 0.003 : 0.002;
+      rotationRef.current.yaw -= e.movementX * sensitivity;
+      rotationRef.current.pitch -= e.movementY * sensitivity;
       rotationRef.current.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, rotationRef.current.pitch));
     };
 
@@ -89,15 +88,13 @@ export function AutoTourController({
       canvas.removeEventListener('mouseup', handleMouseUp);
       canvas.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [isPaused, isMouseDown, gl.domElement]);
+  }, [isPaused, isMouseDown, gl.domElement, performanceTier]);
 
   useEffect(() => {
     if (!isPaused && currentPoint) {
       const direction = new Vector3(...currentPoint.lookAt).sub(new Vector3(...currentPoint.position)).normalize();
-      // Adjust initialization: Three.js camera looks at -Z by default (y-rot = 0)
-      // Math.atan2(x, z) gives angle from +Z. Subtract PI to align with -Z.
-      rotationRef.current.yaw = Math.atan2(direction.x, direction.z) - Math.PI;
-      rotationRef.current.pitch = Math.asin(-direction.y);
+      rotationRef.current.yaw = Math.atan2(direction.x, direction.z);
+      rotationRef.current.pitch = Math.asin(direction.y);
     }
   }, [isPaused, currentPoint]);
 
@@ -105,7 +102,9 @@ export function AutoTourController({
     if (!enabled || !currentPoint) return;
 
     if (isPaused) {
-      const moveSpeed = keys.has('shift') ? 2.0 : 0.5;
+      const keys = keysRef.current;
+      const baseSpeed = performanceTier === 'low' ? 8.0 : 10.0; // Faster movement
+      const moveSpeed = keys.has('shift') ? baseSpeed * 2.5 : baseSpeed;
       
       camera.rotation.order = 'YXZ';
       camera.rotation.y = rotationRef.current.yaw;
@@ -119,10 +118,10 @@ export function AutoTourController({
 
       const movement = new Vector3();
 
-      if (keys.has('w')) movement.add(forward.clone().multiplyScalar(moveSpeed * delta));
-      if (keys.has('s')) movement.add(forward.clone().multiplyScalar(-moveSpeed * delta));
-      if (keys.has('a')) movement.add(right.clone().multiplyScalar(-moveSpeed * delta));
-      if (keys.has('d')) movement.add(right.clone().multiplyScalar(moveSpeed * delta));
+      if (keys.has('w') || keys.has('arrowup')) movement.add(forward.clone().multiplyScalar(moveSpeed * delta));
+      if (keys.has('s') || keys.has('arrowdown')) movement.add(forward.clone().multiplyScalar(-moveSpeed * delta));
+      if (keys.has('a') || keys.has('arrowleft')) movement.add(right.clone().multiplyScalar(-moveSpeed * delta));
+      if (keys.has('d') || keys.has('arrowright')) movement.add(right.clone().multiplyScalar(moveSpeed * delta));
       if (keys.has('q')) movement.y += moveSpeed * delta;
       if (keys.has('e')) movement.y -= moveSpeed * delta;
 

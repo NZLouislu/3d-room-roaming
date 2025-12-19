@@ -1,7 +1,8 @@
 import { useStore } from '../../hooks/useStore';
 
 export const Lighting = () => {
-  const isNight = useStore((state) => state.isNight);
+  const { isNight, performanceTier } = useStore();
+  const isLow = performanceTier === 'low';
 
   return (
     <>
@@ -16,8 +17,8 @@ export const Lighting = () => {
           <directionalLight
             position={[30, 40, 20]}
             intensity={1.8}
-            castShadow
-            shadow-mapSize={[2048, 2048]}
+            castShadow={!isLow}
+            shadow-mapSize={isLow ? [512, 512] : [2048, 2048]}
             shadow-camera-far={100}
             shadow-camera-left={-30}
             shadow-camera-right={30}
@@ -27,7 +28,7 @@ export const Lighting = () => {
           />
           <directionalLight
             position={[-20, 30, 15]}
-            intensity={0.5}
+            intensity={isLow ? 0.2 : 0.5}
             color="#ffeedd"
           />
         </>
@@ -38,12 +39,16 @@ export const Lighting = () => {
             position={[10, 10, 5]}
             intensity={0.4}
             color="#b8c5d6"
-            castShadow
-            shadow-mapSize={[1024, 1024]}
+            castShadow={!isLow}
+            shadow-mapSize={isLow ? [256, 256] : [1024, 1024]}
           />
-          <pointLight position={[0, 3, 10]} intensity={15} color="#ffaa00" distance={20} castShadow />
-          <pointLight position={[-8, 2, -5]} intensity={8} color="#00aaff" distance={15} />
-          <pointLight position={[8, 2, -5]} intensity={8} color="#ff8800" distance={15} />
+          <pointLight position={[0, 3, 10]} intensity={isLow ? 5 : 15} color="#ffaa00" distance={15} castShadow={!isLow} />
+          {!isLow && (
+            <>
+              <pointLight position={[-8, 2, -5]} intensity={8} color="#00aaff" distance={15} />
+              <pointLight position={[8, 2, -5]} intensity={8} color="#ff8800" distance={15} />
+            </>
+          )}
         </>
       )}
     </>

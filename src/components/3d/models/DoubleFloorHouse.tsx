@@ -2,6 +2,7 @@ import { useGLTF } from '@react-three/drei';
 import { RigidBody } from '@react-three/rapier';
 import { Suspense, useEffect } from 'react';
 import { Box3, Vector3 } from 'three';
+import { useStore } from '../../../hooks/useStore';
 
 export function DoubleFloorHouse(props: JSX.IntrinsicElements['group']) {
   const { scene } = useGLTF('/models/two-story-house.glb');
@@ -32,6 +33,7 @@ useGLTF.preload('/models/two-story-house.glb');
 
 function DoubleFloorHouseInner(props: JSX.IntrinsicElements['group']) {
   const { scene } = useGLTF('/models/two-story-house.glb');
+  const performanceTier = useStore((state) => state.performanceTier);
 
   useEffect(() => {
     if (scene) {
@@ -46,14 +48,18 @@ function DoubleFloorHouseInner(props: JSX.IntrinsicElements['group']) {
   const offsetY = 14.11;
   const offsetZ = 138.17;
   
+  // Choose collider type based on performance tier
+  // Trimesh is very expensive, "hull" or "cuboid" is much cheaper
+  const colliderType = performanceTier === 'low' ? 'hull' : 'trimesh';
+  
   return (
-    <RigidBody type="fixed" colliders="trimesh">
+    <RigidBody type="fixed" colliders={colliderType}>
       <group {...props} position={[offsetX, offsetY, offsetZ]}>
         <primitive 
           object={scene} 
           scale={1}
-          castShadow
-          receiveShadow
+          castShadow={performanceTier !== 'low'}
+          receiveShadow={performanceTier !== 'low'}
         />
       </group>
     </RigidBody>
