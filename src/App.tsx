@@ -263,11 +263,12 @@ function AppImproved() {
         <div className="fixed bottom-4 right-4 bg-black/70 text-white px-4 py-3 rounded-lg text-sm backdrop-blur-sm z-20">
           <div className="font-bold mb-2">Controls</div>
           <ul className="space-y-1 text-xs">
-            <li>Right-click drag to rotate view</li>
+            {mode === 'free-explore' && <li>Right-click drag to rotate view</li>}
+            {tourEnabled && tourPaused && <li>Left-click drag to rotate view</li>}
             <li>WASD to move</li>
             <li>Shift to run</li>
             {mode === 'free-explore' && <li>📍 Quick viewpoints (left panel)</li>}
-            {tourEnabled && tourPaused && <li>🔧 WASD/QE to fine-tune position</li>}
+            {tourEnabled && tourPaused && <li>🔧 QE to move up/down</li>}
           </ul>
         </div>
       )}

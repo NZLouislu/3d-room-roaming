@@ -1,6 +1,6 @@
 import { useFrame, useThree } from '@react-three/fiber';
-import { Vector3 } from 'three';
-import { useEffect, useState } from 'react';
+import { Vector3, Euler } from 'three';
+import { useEffect, useState, useRef } from 'react';
 import { TourPoint } from '../../data/tourPoints';
 
 interface AutoTourControllerProps {
@@ -30,12 +30,16 @@ export function AutoTourController({
   customLookAt,
   onPositionChange
 }: AutoTourControllerProps) {
-  const { camera } = useThree();
+  const { camera, gl } = useThree();
   const [keys, setKeys] = useState<Set<string>>(new Set());
+  const [isMouseDown, setIsMouseDown] = useState(false);
+  const rotationRef = useRef({ yaw: 0, pitch: 0 });
   
   const currentPoint = tourPoints[currentIndex];
 
   useEffect(() => {
+    const canvas = gl.domElement;
+
     const handleKeyDown = (e: KeyboardEvent) => {
       setKeys(prev => new Set(prev).add(e.key.toLowerCase()));
     };
@@ -48,26 +52,74 @@ export function AutoTourController({
       });
     };
 
+    const handleMouseDown = (e: MouseEvent) => {
+      if (e.button === 0) {
+        setIsMouseDown(true);
+        canvas.requestPointerLock();
+      }
+    };
+
+    const handleMouseUp = (e: MouseEvent) => {
+      if (e.button === 0) {
+        setIsMouseDown(false);
+        document.exitPointerLock();
+      }
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isPaused || !isMouseDown) return;
+
+      const sensitivity = 0.002;
+      rotationRef.current.yaw -= e.movementX * sensitivity;
+      rotationRef.current.pitch -= e.movementY * sensitivity;
+      rotationRef.current.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, rotationRef.current.pitch));
+    };
+
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+    canvas.addEventListener('mousedown', handleMouseDown);
+    canvas.addEventListener('mouseup', handleMouseUp);
+    canvas.addEventListener('mousemove', handleMouseMove);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
+      canvas.removeEventListener('mousedown', handleMouseDown);
+      canvas.removeEventListener('mouseup', handleMouseUp);
+      canvas.removeEventListener('mousemove', handleMouseMove);
     };
-  }, []);
+  }, [isPaused, isMouseDown, gl.domElement]);
+
+  useEffect(() => {
+    if (!isPaused && currentPoint) {
+      const direction = new Vector3(...currentPoint.lookAt).sub(new Vector3(...currentPoint.position)).normalize();
+      rotationRef.current.yaw = Math.atan2(direction.x, direction.z);
+      rotationRef.current.pitch = Math.asin(-direction.y);
+    }
+  }, [isPaused, currentPoint]);
 
   useFrame((_state, delta) => {
     if (!enabled || !currentPoint) return;
 
     if (isPaused) {
       const moveSpeed = keys.has('shift') ? 2.0 : 0.5;
+      
+      camera.rotation.order = 'YXZ';
+      camera.rotation.y = rotationRef.current.yaw;
+      camera.rotation.x = rotationRef.current.pitch;
+
+      const forward = new Vector3(0, 0, 1);
+      const right = new Vector3(1, 0, 0);
+      
+      forward.applyEuler(new Euler(0, rotationRef.current.yaw, 0, 'YXZ'));
+      right.applyEuler(new Euler(0, rotationRef.current.yaw, 0, 'YXZ'));
+
       const movement = new Vector3();
 
-      if (keys.has('w')) movement.z += moveSpeed * delta;
-      if (keys.has('s')) movement.z -= moveSpeed * delta;
-      if (keys.has('a')) movement.x -= moveSpeed * delta;
-      if (keys.has('d')) movement.x += moveSpeed * delta;
+      if (keys.has('w')) movement.add(forward.clone().multiplyScalar(moveSpeed * delta));
+      if (keys.has('s')) movement.add(forward.clone().multiplyScalar(-moveSpeed * delta));
+      if (keys.has('a')) movement.add(right.clone().multiplyScalar(-moveSpeed * delta));
+      if (keys.has('d')) movement.add(right.clone().multiplyScalar(moveSpeed * delta));
       if (keys.has('q')) movement.y += moveSpeed * delta;
       if (keys.has('e')) movement.y -= moveSpeed * delta;
 
@@ -82,11 +134,6 @@ export function AutoTourController({
           ]);
         }
       }
-
-      const targetLookAt = customLookAt 
-        ? new Vector3(...customLookAt)
-        : new Vector3(...currentPoint.lookAt);
-      camera.lookAt(targetLookAt);
 
       return;
     }
