@@ -67,18 +67,19 @@ function AppImproved() {
   });
 
   const [rendererReady, setRendererReady] = useState(false);
-  const setRendererType = useStore((state) => state.setRendererType);
+  const { setRendererType, performanceTier, setPerformanceTier } = useStore();
 
   useEffect(() => {
     detectRendererCapabilities().then((capabilities) => {
       setRendererType(capabilities.type);
+      setPerformanceTier(capabilities.performanceTier);
       setRendererReady(true);
-      console.log(`Renderer initialized: ${capabilities.type}`);
+      console.log(`Renderer initialized: ${capabilities.type} (${capabilities.performanceTier} tier)`);
       if (capabilities.features) {
         console.log('WebGPU features:', capabilities.features);
       }
     });
-  }, [setRendererType]);
+  }, [setRendererType, setPerformanceTier]);
 
   const handleToggleBirdView = () => {
     if (mode === 'bird-view') {
@@ -156,14 +157,15 @@ function AppImproved() {
 
       {rendererReady && (
         <Canvas 
-          shadows 
+          shadows={performanceTier !== 'low'}
+          dpr={performanceTier === 'low' ? [1, 1] : [1, 2]}
           camera={{ 
             fov: 45, 
             position: mode === 'auto-tour' ? [0, 28, -40] : [0, 12, 30] 
           }}
           gl={(canvas) => {
             const rendererType = useStore.getState().rendererType;
-            const config = getRendererConfig(rendererType);
+            const config = getRendererConfig(rendererType, performanceTier);
             
             const renderer = new THREE.WebGLRenderer({
               canvas,
@@ -183,8 +185,8 @@ function AppImproved() {
         <directionalLight
           position={[10, 20, 10]}
           intensity={1}
-          castShadow
-          shadow-mapSize={[2048, 2048]}
+          castShadow={performanceTier !== 'low'}
+          shadow-mapSize={performanceTier === 'high' ? [2048, 2048] : [1024, 1024]}
         />
         <Physics debug={false}>
           <ExperienceImproved 

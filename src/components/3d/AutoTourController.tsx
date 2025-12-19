@@ -70,8 +70,9 @@ export function AutoTourController({
       if (!isPaused || !isMouseDown) return;
 
       const sensitivity = 0.002;
-      rotationRef.current.yaw -= e.movementX * sensitivity;
-      rotationRef.current.pitch -= e.movementY * sensitivity;
+      // Flip signs for more intuitive drag-to-look behavior
+      rotationRef.current.yaw += e.movementX * sensitivity;
+      rotationRef.current.pitch += e.movementY * sensitivity;
       rotationRef.current.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, rotationRef.current.pitch));
     };
 
@@ -93,7 +94,9 @@ export function AutoTourController({
   useEffect(() => {
     if (!isPaused && currentPoint) {
       const direction = new Vector3(...currentPoint.lookAt).sub(new Vector3(...currentPoint.position)).normalize();
-      rotationRef.current.yaw = Math.atan2(direction.x, direction.z);
+      // Adjust initialization: Three.js camera looks at -Z by default (y-rot = 0)
+      // Math.atan2(x, z) gives angle from +Z. Subtract PI to align with -Z.
+      rotationRef.current.yaw = Math.atan2(direction.x, direction.z) - Math.PI;
       rotationRef.current.pitch = Math.asin(-direction.y);
     }
   }, [isPaused, currentPoint]);

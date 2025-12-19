@@ -1,14 +1,64 @@
 export type RendererType = 'webgpu' | 'webgl2' | 'webgl';
+export type PerformanceTier = 'low' | 'medium' | 'high';
 
 export interface RendererCapabilities {
   type: RendererType;
+  performanceTier: PerformanceTier;
   supported: boolean;
   features?: string[];
 }
 
+function getPerformanceTier(): PerformanceTier {
+  if (typeof navigator === 'undefined') return 'medium';
+
+  const cores = navigator.hardwareConcurrency || 4;
+  
+  // Try to get GPU info via WebGL
+  const canvas = document.createElement('canvas');
+  const gl = (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
+  let rendererString = '';
+  
+  if (gl) {
+    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+    if (debugInfo) {
+      rendererString = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || '';
+    }
+  }
+
+  const renderer = rendererString.toLowerCase();
+
+  // High Tier: Apple M-series, RTX/GTX Discrete, Radeon RX
+  if (
+    renderer.includes('apple m') || 
+    renderer.includes('rtx') || 
+    renderer.includes('gtx') || 
+    renderer.includes('radeon rx') ||
+    renderer.includes('discrete') ||
+    (cores >= 8 && (renderer.includes('apple') || renderer.includes('nvidia') || renderer.includes('amd')))
+  ) {
+    return 'high';
+  }
+
+  // Low Tier: Intel UHD/HD, Mobile/Mali/Adreno (generally), Software renderers
+  if (
+    (renderer.includes('intel') && !renderer.includes('iris') && !renderer.includes('arc')) ||
+    renderer.includes('uhd') ||
+    renderer.includes('hd graphics') ||
+    renderer.includes('swiftshader') ||
+    renderer.includes('software') ||
+    cores <= 4
+  ) {
+    return 'low';
+  }
+
+  return 'medium';
+}
+
 export async function detectRendererCapabilities(): Promise<RendererCapabilities> {
+  const performanceTier = getPerformanceTier();
+
   if (typeof navigator === 'undefined') {
-    return { type: 'webgl', supported: true };
+    return { type: 'webgl', performanceTier, supported: true };
   }
 
   if ('gpu' in navigator) {
@@ -17,6 +67,7 @@ export async function detectRendererCapabilities(): Promise<RendererCapabilities
       if (adapter) {
         return {
           type: 'webgpu',
+          performanceTier,
           supported: true,
           features: Array.from(adapter.features || [])
         };
@@ -29,28 +80,30 @@ export async function detectRendererCapabilities(): Promise<RendererCapabilities
   const canvas = document.createElement('canvas');
   const gl2 = canvas.getContext('webgl2');
   if (gl2) {
-    return { type: 'webgl2', supported: true };
+    return { type: 'webgl2', performanceTier, supported: true };
   }
 
   const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
   if (gl) {
-    return { type: 'webgl', supported: true };
+    return { type: 'webgl', performanceTier, supported: true };
   }
 
-  return { type: 'webgl', supported: false };
+  return { type: 'webgl', performanceTier, supported: false };
 }
 
-export function getRendererConfig(type: RendererType) {
+export function getRendererConfig(type: RendererType, tier: PerformanceTier = 'medium') {
+  const isLow = tier === 'low';
+  
   switch (type) {
     case 'webgpu':
       return {
-        antialias: true,
+        antialias: !isLow,
         powerPreference: 'high-performance' as const,
         alpha: false,
       };
     case 'webgl2':
       return {
-        antialias: true,
+        antialias: !isLow,
         powerPreference: 'high-performance' as const,
         alpha: false,
         stencil: false,
@@ -58,7 +111,7 @@ export function getRendererConfig(type: RendererType) {
     case 'webgl':
     default:
       return {
-        antialias: true,
+        antialias: !isLow,
         powerPreference: 'default' as const,
         alpha: false,
       };
