@@ -69,7 +69,7 @@ export function AutoTourController({
     const handleMouseMove = (e: MouseEvent) => {
       if (!isPaused || !isMouseDown) return;
 
-      const sensitivity = performanceTier === 'low' ? 0.003 : 0.002;
+      const sensitivity = performanceTier === 'low' ? 0.002 : 0.0015;
       rotationRef.current.yaw -= e.movementX * sensitivity;
       rotationRef.current.pitch -= e.movementY * sensitivity;
       rotationRef.current.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, rotationRef.current.pitch));
@@ -103,8 +103,9 @@ export function AutoTourController({
 
     if (isPaused) {
       const keys = keysRef.current;
-      const baseSpeed = performanceTier === 'low' ? 8.0 : 10.0; // Faster movement
-      const moveSpeed = keys.has('shift') ? baseSpeed * 2.5 : baseSpeed;
+      // Reduced speed for better precision when finding view angles
+      const baseSpeed = performanceTier === 'low' ? 2.0 : 3.0; 
+      const moveSpeed = keys.has('shift') ? baseSpeed * 4.0 : baseSpeed;
       
       camera.rotation.order = 'YXZ';
       camera.rotation.y = rotationRef.current.yaw;
