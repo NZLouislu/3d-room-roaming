@@ -1,6 +1,6 @@
 import { useGLTF } from '@react-three/drei';
-import { RigidBody } from '@react-three/rapier';
-import { Suspense, useEffect } from 'react';
+import { RigidBody, CuboidCollider } from '@react-three/rapier';
+import { Suspense, useEffect, useMemo } from 'react';
 import { Box3, Vector3 } from 'three';
 import { useStore } from '../../../hooks/useStore';
 
@@ -36,12 +36,18 @@ function DoubleFloorHouseInner(props: JSX.IntrinsicElements['group']) {
   const performanceTier = useStore((state) => state.performanceTier);
   const isMobile = useStore((state) => state.isMobile);
 
-  useEffect(() => {
-    if (scene) {
+  const modelBounds = useMemo(() => {
+    if (!scene) return { size: new Vector3(20, 20, 20) };
+    
+    try {
       const box = new Box3().setFromObject(scene);
-      const center = box.getCenter(new Vector3());
       const size = box.getSize(new Vector3());
-      console.log('[HouseWithPhysics] Model center:', center.toArray(), 'size:', size.toArray());
+      const center = box.getCenter(new Vector3());
+      console.log('[HouseWithPhysics] Model bounds:', { size: size.toArray(), center: center.toArray() });
+      return { size };
+    } catch (error) {
+      console.error('[HouseWithPhysics] Error calculating bounds:', error);
+      return { size: new Vector3(20, 20, 20) };
     }
   }, [scene]);
 
@@ -49,19 +55,51 @@ function DoubleFloorHouseInner(props: JSX.IntrinsicElements['group']) {
   const offsetY = 14.11;
   const offsetZ = 138.17;
   
-  // Choose collider type based on performance tier and device
-  // Trimesh is very expensive and can crash mobile browsers during build
-  // Force hull/cuboid on mobile for stability
-  const colliderType = (performanceTier === 'low' || isMobile) ? 'hull' : 'trimesh';
+  // On mobile/low-tier: Use manual cuboid colliders for stability
+  // On desktop high-tier: Use automatic hull/trimesh for accuracy
+  const useManualColliders = isMobile || performanceTier === 'low';
+  
+  if (useManualColliders) {
+    return (
+      <RigidBody type="fixed" colliders={false}>
+        <group {...props} position={[offsetX, offsetY, offsetZ]}>
+          <primitive 
+            object={scene} 
+            scale={1}
+            castShadow={!isMobile && performanceTier !== 'low'}
+            receiveShadow={!isMobile && performanceTier !== 'low'}
+          />
+          
+          {/* Ground floor collider */}
+          <CuboidCollider 
+            args={[modelBounds.size.x / 2, 5, modelBounds.size.z / 2]} 
+            position={[0, 0, 0]}
+          />
+          
+          {/* Second floor collider */}
+          <CuboidCollider 
+            args={[modelBounds.size.x / 2, 5, modelBounds.size.z / 2]} 
+            position={[0, 10, 0]}
+          />
+          
+          {/* Roof collider */}
+          <CuboidCollider 
+            args={[modelBounds.size.x / 2, 2, modelBounds.size.z / 2]} 
+            position={[0, 18, 0]}
+          />
+        </group>
+      </RigidBody>
+    );
+  }
   
   return (
-    <RigidBody type="fixed" colliders={colliderType}>
+    <RigidBody type="fixed" colliders="hull">
       <group {...props} position={[offsetX, offsetY, offsetZ]}>
         <primitive 
           object={scene} 
           scale={1}
-          castShadow={performanceTier !== 'low'}
-          receiveShadow={performanceTier !== 'low'}
+          castShadow={performanceTier === 'high'}
+          receiveShadow={performanceTier === 'high'}
         />
       </group>
     </RigidBody>
