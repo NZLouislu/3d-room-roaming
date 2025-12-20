@@ -76,7 +76,11 @@ function getPerformanceTier(): PerformanceTier {
 
 export async function detectRendererCapabilities(): Promise<RendererCapabilities> {
   const performanceTier = getPerformanceTier();
-  const isMobile = typeof navigator !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  
+  // Robust mobile detection: check UA and also touch points for "Desktop Mode" on tablets/phones
+  const isMobileUA = typeof navigator !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const hasTouch = typeof navigator !== 'undefined' && (navigator.maxTouchPoints > 0 || 'ontouchstart' in window);
+  const isMobile = isMobileUA || (hasTouch && /Macintosh/i.test(navigator.userAgent)); // iPads/iPhones in desktop mode look like Macs but have touch
 
   if (typeof navigator === 'undefined') {
     return { type: 'webgl', performanceTier, supported: true, isMobile: false };
