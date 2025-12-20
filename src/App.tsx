@@ -67,7 +67,7 @@ function AppImproved() {
   });
 
   const [rendererReady, setRendererReady] = useState(false);
-  const { setRendererType, performanceTier, setPerformanceTier, setIsMobile } = useStore();
+  const { setRendererType, performanceTier, setPerformanceTier, setIsMobile, isMobile } = useStore();
 
   useEffect(() => {
     detectRendererCapabilities().then((capabilities) => {
@@ -161,23 +161,35 @@ function AppImproved() {
       {rendererReady && (
         <Canvas 
           shadows={performanceTier === 'high'}
-          dpr={performanceTier === 'low' ? 0.75 : [1, 1.5]} // Cap at 1.5 for mobile stability
+          dpr={isMobile ? 1.0 : (performanceTier === 'low' ? 0.75 : [1, 1.5])}
           camera={{ 
             fov: 45, 
             position: mode === 'auto-tour' ? [0, 28, -40] : [0, 12, 30] 
           }}
           gl={{
-            antialias: performanceTier !== 'low',
-            powerPreference: 'high-performance',
+            antialias: !isMobile && performanceTier !== 'low',
+            powerPreference: isMobile ? 'default' : 'high-performance',
             alpha: false,
             stencil: false,
             depth: true,
+            preserveDrawingBuffer: false,
+            failIfMajorPerformanceCaveat: false,
           }}
           onCreated={({ gl }) => {
+            const glContext = gl.getContext();
+            console.log('[Canvas] WebGL initialized:', {
+              vendor: glContext.getParameter(glContext.VENDOR),
+              renderer: glContext.getParameter(glContext.RENDERER),
+              version: glContext.getParameter(glContext.VERSION),
+              maxTextureSize: glContext.getParameter(glContext.MAX_TEXTURE_SIZE)
+            });
             gl.shadowMap.enabled = performanceTier === 'high';
             gl.shadowMap.type = THREE.PCFSoftShadowMap;
             gl.toneMapping = THREE.ACESFilmicToneMapping;
             gl.toneMappingExposure = 1;
+          }}
+          onError={(error) => {
+            console.error('[Canvas] Error during initialization:', error);
           }}
         >
         <Sky sunPosition={[100, 20, 100]} />
@@ -237,6 +249,7 @@ function AppImproved() {
           onUpdatePosition={setCustomPosition}
           onUpdateLookAt={setCustomLookAt}
           onApplyChanges={handleApplyChanges}
+          livePosition={tourPaused ? currentCameraPos : undefined}
         />
       )}
 

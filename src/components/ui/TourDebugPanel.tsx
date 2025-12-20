@@ -12,6 +12,7 @@ interface TourDebugPanelProps {
   onUpdatePosition: (pos: [number, number, number]) => void;
   onUpdateLookAt: (lookAt: [number, number, number]) => void;
   onApplyChanges: () => void;
+  livePosition?: [number, number, number];
 }
 
 export function TourDebugPanel({
@@ -24,27 +25,33 @@ export function TourDebugPanel({
   currentLookAt,
   onUpdatePosition,
   onUpdateLookAt,
-  onApplyChanges
+  onApplyChanges,
+  livePosition
 }: TourDebugPanelProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [editMode, setEditMode] = useState(false);
   
-  const [posX, setPosX] = useState(currentPosition[0].toFixed(2));
-  const [posY, setPosY] = useState(currentPosition[1].toFixed(2));
-  const [posZ, setPosZ] = useState(currentPosition[2].toFixed(2));
+  const displayPosition = livePosition || currentPosition;
+  
+  const [posX, setPosX] = useState(displayPosition[0].toFixed(2));
+  const [posY, setPosY] = useState(displayPosition[1].toFixed(2));
+  const [posZ, setPosZ] = useState(displayPosition[2].toFixed(2));
   
   const [lookX, setLookX] = useState(currentLookAt[0].toFixed(2));
   const [lookY, setLookY] = useState(currentLookAt[1].toFixed(2));
   const [lookZ, setLookZ] = useState(currentLookAt[2].toFixed(2));
 
   useEffect(() => {
-    setPosX(currentPosition[0].toFixed(2));
-    setPosY(currentPosition[1].toFixed(2));
-    setPosZ(currentPosition[2].toFixed(2));
+    setPosX(displayPosition[0].toFixed(2));
+    setPosY(displayPosition[1].toFixed(2));
+    setPosZ(displayPosition[2].toFixed(2));
+  }, [displayPosition]);
+
+  useEffect(() => {
     setLookX(currentLookAt[0].toFixed(2));
     setLookY(currentLookAt[1].toFixed(2));
     setLookZ(currentLookAt[2].toFixed(2));
-  }, [currentPosition, currentLookAt]);
+  }, [currentLookAt]);
 
   const handleApply = () => {
     const newPos: [number, number, number] = [
@@ -145,7 +152,7 @@ export function TourDebugPanel({
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-semibold text-gray-700">
-                Position (X, Y, Z)
+                Position (X, Y, Z) {livePosition && <span className="text-green-600">● Live</span>}
               </label>
               {editMode && (
                 <span className="text-xs text-gray-500">Editable</span>
@@ -253,6 +260,9 @@ export function TourDebugPanel({
             <li><kbd className="px-1 py-0.5 bg-white rounded border">E</kbd> Move down (-Y)</li>
             <li className="mt-2 pt-2 border-t border-blue-200">
               <kbd className="px-1 py-0.5 bg-white rounded border">Shift</kbd> + Key = Faster movement
+            </li>
+            <li className="mt-2 pt-2 border-t border-blue-200 text-green-700 font-semibold">
+              Coordinates update in real-time as you move!
             </li>
           </ul>
         </div>

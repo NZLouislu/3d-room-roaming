@@ -14,49 +14,64 @@ function getPerformanceTier(): PerformanceTier {
 
   const cores = navigator.hardwareConcurrency || 4;
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
   
-  // Try to get GPU info via WebGL
-  const canvas = document.createElement('canvas');
-  const gl = (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
-  let rendererString = '';
-  
-  if (gl) {
-    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-    if (debugInfo) {
-      rendererString = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || '';
+  try {
+    const canvas = document.createElement('canvas');
+    const gl = (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
+    let rendererString = '';
+    
+    if (gl) {
+      const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+      if (debugInfo) {
+        rendererString = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || '';
+      }
     }
+
+    const renderer = rendererString.toLowerCase();
+
+    // High Tier: Desktop only - Apple M-series, RTX/GTX Discrete, Radeon RX
+    if (!isMobile && (
+      renderer.includes('apple m') || 
+      renderer.includes('rtx') || 
+      renderer.includes('gtx') || 
+      renderer.includes('radeon rx') ||
+      renderer.includes('discrete') ||
+      (cores >= 8 && (renderer.includes('nvidia') || renderer.includes('amd')))
+    )) {
+      return 'high';
+    }
+
+    // iOS devices: Maximum medium tier for stability
+    if (isIOS) {
+      if (renderer.includes('apple') && !renderer.includes('a8') && !renderer.includes('a9')) {
+        return 'medium';
+      }
+      return 'low';
+    }
+
+    // Other mobile devices
+    if (isMobile) {
+      return 'low';
+    }
+
+    // Low Tier: Intel UHD/HD, Software renderers
+    if (
+      (renderer.includes('intel') && !renderer.includes('iris') && !renderer.includes('arc')) ||
+      renderer.includes('uhd') ||
+      renderer.includes('hd graphics') ||
+      renderer.includes('swiftshader') ||
+      renderer.includes('software') ||
+      cores <= 4
+    ) {
+      return 'low';
+    }
+
+    return 'medium';
+  } catch (error) {
+    console.warn('Error detecting performance tier:', error);
+    return isMobile ? 'low' : 'medium';
   }
-
-  const renderer = rendererString.toLowerCase();
-
-  // High Tier: Apple M-series, RTX/GTX Discrete, Radeon RX
-  if (
-    renderer.includes('apple m') || 
-    renderer.includes('rtx') || 
-    renderer.includes('gtx') || 
-    renderer.includes('radeon rx') ||
-    renderer.includes('discrete') ||
-    (cores >= 8 && (renderer.includes('apple') || renderer.includes('nvidia') || renderer.includes('amd')))
-  ) {
-    return 'high';
-  }
-
-  // Low Tier: Intel UHD/HD, Mobile/Mali/Adreno (generally), Software renderers
-  if (
-    (renderer.includes('intel') && !renderer.includes('iris') && !renderer.includes('arc')) ||
-    renderer.includes('uhd') ||
-    renderer.includes('hd graphics') ||
-    renderer.includes('swiftshader') ||
-    renderer.includes('software') ||
-    renderer.includes('mali') ||
-    renderer.includes('adreno') ||
-    cores <= 4 ||
-    (isMobile && !renderer.includes('apple')) // Most mobiles are low/medium unless they are Apple Silicon
-  ) {
-    return 'low';
-  }
-
-  return 'medium';
 }
 
 export async function detectRendererCapabilities(): Promise<RendererCapabilities> {
