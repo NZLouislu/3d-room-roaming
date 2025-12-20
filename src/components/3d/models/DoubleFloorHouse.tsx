@@ -34,6 +34,7 @@ useGLTF.preload('/models/two-story-house.glb');
 function DoubleFloorHouseInner(props: JSX.IntrinsicElements['group']) {
   const { scene } = useGLTF('/models/two-story-house.glb');
   const performanceTier = useStore((state) => state.performanceTier);
+  const isMobile = useStore((state) => state.isMobile);
 
   useEffect(() => {
     if (scene) {
@@ -48,9 +49,10 @@ function DoubleFloorHouseInner(props: JSX.IntrinsicElements['group']) {
   const offsetY = 14.11;
   const offsetZ = 138.17;
   
-  // Choose collider type based on performance tier
-  // Trimesh is very expensive, "hull" or "cuboid" is much cheaper
-  const colliderType = performanceTier === 'low' ? 'hull' : 'trimesh';
+  // Choose collider type based on performance tier and device
+  // Trimesh is very expensive and can crash mobile browsers during build
+  // Force hull/cuboid on mobile for stability
+  const colliderType = (performanceTier === 'low' || isMobile) ? 'hull' : 'trimesh';
   
   return (
     <RigidBody type="fixed" colliders={colliderType}>

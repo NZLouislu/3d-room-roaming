@@ -17,7 +17,7 @@ import { CoordinatesPanel } from './components/ui/CoordinatesPanel';
 import { BirdViewControls } from './components/3d/BirdViewControls';
 import { PerformanceMonitor } from './components/3d/PerformanceMonitor';
 import { PerformanceHUD } from './components/ui/PerformanceHUD';
-import { detectRendererCapabilities, getRendererConfig } from './utils/rendererDetection';
+import { detectRendererCapabilities } from './utils/rendererDetection';
 import { useStore } from './hooks/useStore';
 
 type AppMode = 'welcome' | 'auto-tour' | 'free-explore' | 'bird-view';
@@ -67,19 +67,20 @@ function AppImproved() {
   });
 
   const [rendererReady, setRendererReady] = useState(false);
-  const { setRendererType, performanceTier, setPerformanceTier } = useStore();
+  const { setRendererType, performanceTier, setPerformanceTier, setIsMobile } = useStore();
 
   useEffect(() => {
     detectRendererCapabilities().then((capabilities) => {
       setRendererType(capabilities.type);
       setPerformanceTier(capabilities.performanceTier);
+      setIsMobile(capabilities.isMobile);
       setRendererReady(true);
-      console.log(`Renderer initialized: ${capabilities.type} (${capabilities.performanceTier} tier)`);
+      console.log(`Renderer initialized: ${capabilities.type} (${capabilities.performanceTier} tier, mobile: ${capabilities.isMobile})`);
       if (capabilities.features) {
         console.log('WebGPU features:', capabilities.features);
       }
     });
-  }, [setRendererType, setPerformanceTier]);
+  }, [setRendererType, setPerformanceTier, setIsMobile]);
 
   const handleToggleBirdView = () => {
     if (mode === 'bird-view') {
@@ -152,32 +153,31 @@ function AppImproved() {
       )}
 
       {mode === 'welcome' && (
-        <RealEstateWelcome onStart={handleWelcomeChoice} />
+        <div className="fixed inset-0 z-[100]">
+          <RealEstateWelcome onStart={handleWelcomeChoice} />
+        </div>
       )}
 
       {rendererReady && (
         <Canvas 
-          shadows={performanceTier !== 'low'}
-          dpr={performanceTier === 'low' ? 0.75 : [1, 2]}
+          shadows={performanceTier === 'high'}
+          dpr={performanceTier === 'low' ? 0.75 : [1, 1.5]} // Cap at 1.5 for mobile stability
           camera={{ 
             fov: 45, 
             position: mode === 'auto-tour' ? [0, 28, -40] : [0, 12, 30] 
           }}
-          gl={(canvas) => {
-            const rendererType = useStore.getState().rendererType;
-            const config = getRendererConfig(rendererType, performanceTier);
-            
-            const renderer = new THREE.WebGLRenderer({
-              canvas,
-              ...config,
-            });
-            
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 1;
-            
-            return renderer;
+          gl={{
+            antialias: performanceTier !== 'low',
+            powerPreference: 'high-performance',
+            alpha: false,
+            stencil: false,
+            depth: true,
+          }}
+          onCreated={({ gl }) => {
+            gl.shadowMap.enabled = performanceTier === 'high';
+            gl.shadowMap.type = THREE.PCFSoftShadowMap;
+            gl.toneMapping = THREE.ACESFilmicToneMapping;
+            gl.toneMappingExposure = 1;
           }}
         >
         <Sky sunPosition={[100, 20, 100]} />

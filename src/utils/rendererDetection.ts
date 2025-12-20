@@ -5,6 +5,7 @@ export interface RendererCapabilities {
   type: RendererType;
   performanceTier: PerformanceTier;
   supported: boolean;
+  isMobile: boolean;
   features?: string[];
 }
 
@@ -60,39 +61,42 @@ function getPerformanceTier(): PerformanceTier {
 
 export async function detectRendererCapabilities(): Promise<RendererCapabilities> {
   const performanceTier = getPerformanceTier();
+  const isMobile = typeof navigator !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
   if (typeof navigator === 'undefined') {
-    return { type: 'webgl', performanceTier, supported: true };
+    return { type: 'webgl', performanceTier, supported: true, isMobile: false };
   }
 
+  // Check for WebGPU, but be cautious as it's still experimental on some platforms (like iOS 18)
+  // For now, we'll prefer WebGL2 for stability unless we explicitly want to test WebGPU
   if ('gpu' in navigator) {
     try {
-      const adapter = await (navigator as any).gpu?.requestAdapter();
-      if (adapter) {
-        return {
-          type: 'webgpu',
-          performanceTier,
-          supported: true,
-          features: Array.from(adapter.features || [])
-        };
-      }
+      // Add a timeout to adapter request to prevent hanging on some mobile browsers
+      const adapterPromise = (navigator as any).gpu?.requestAdapter();
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('WebGPU timeout')), 2000)
+      );
+      
+      await Promise.race([adapterPromise, timeoutPromise]);
     } catch (error) {
-      console.warn('WebGPU detection failed:', error);
+      console.warn('WebGPU detection failed or timed out:', error);
     }
   }
 
   const canvas = document.createElement('canvas');
+  
+  // Prefer WebGL2 for stability on mobile for now
   const gl2 = canvas.getContext('webgl2');
   if (gl2) {
-    return { type: 'webgl2', performanceTier, supported: true };
+    return { type: 'webgl2', performanceTier, supported: true, isMobile };
   }
 
   const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
   if (gl) {
-    return { type: 'webgl', performanceTier, supported: true };
+    return { type: 'webgl', performanceTier, supported: true, isMobile };
   }
 
-  return { type: 'webgl', performanceTier, supported: false };
+  return { type: 'webgl', performanceTier, supported: false, isMobile };
 }
 
 export function getRendererConfig(type: RendererType, tier: PerformanceTier = 'medium') {

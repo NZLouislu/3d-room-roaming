@@ -10,6 +10,8 @@ interface State {
   setRendererType: (type: RendererType) => void;
   performanceTier: PerformanceTier;
   setPerformanceTier: (tier: PerformanceTier) => void;
+  isMobile: boolean;
+  setIsMobile: (isMobile: boolean) => void;
   fps: number;
   setFps: (fps: number) => void;
 }
@@ -23,6 +25,8 @@ export const useStore = create<State>((set) => ({
   setRendererType: (type) => set({ rendererType: type }),
   performanceTier: 'medium',
   setPerformanceTier: (tier) => set({ performanceTier: tier }),
+  isMobile: false,
+  setIsMobile: (isMobile) => set({ isMobile }),
   fps: 60,
   setFps: (fps) => set({ fps }),
 }));
