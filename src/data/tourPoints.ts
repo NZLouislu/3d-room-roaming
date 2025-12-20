@@ -19,7 +19,7 @@ export const DOUBLE_FLOOR_HOUSE_TOUR: TourPoint[] = [
   },
   {
     id: 2,
-    position: [12, 15, -17],
+    position: [11.25, 13.62, -12.55],
     lookAt: [0, 12, 0],
     duration: 4,
     title: "Backyard Deck & Patio",
@@ -27,7 +27,7 @@ export const DOUBLE_FLOOR_HOUSE_TOUR: TourPoint[] = [
   },
   {
     id: 3,
-    position: [-10, 12, -20],
+    position: [7.51, 14.27, -1.49],
     lookAt: [0, 12, -12],
     duration: 3,
     title: "Outdoor Stairs",
@@ -43,7 +43,7 @@ export const DOUBLE_FLOOR_HOUSE_TOUR: TourPoint[] = [
   },
   {
     id: 5,
-    position: [0, 12, -10],
+    position: [22.98, 15.00, 2.52],
     lookAt: [0, 12, -5],
     duration: 4,
     title: "Main Entrance Door",
@@ -61,7 +61,7 @@ export const DOUBLE_FLOOR_HOUSE_TOUR: TourPoint[] = [
   },
   {
     id: 7,
-    position: [9, 16, 5],
+    position: [6.26, 16.00, 4.43],
     lookAt: [0, 16, 5],
     duration: 5,
     title: "Living Room",

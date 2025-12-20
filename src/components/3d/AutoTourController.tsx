@@ -70,7 +70,7 @@ export function AutoTourController({
       if (!isPaused || !isMouseDown) return;
 
       const sensitivity = performanceTier === 'low' ? 0.002 : 0.0015;
-      rotationRef.current.yaw -= e.movementX * sensitivity;
+      rotationRef.current.yaw += e.movementX * sensitivity;
       rotationRef.current.pitch -= e.movementY * sensitivity;
       rotationRef.current.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, rotationRef.current.pitch));
     };
