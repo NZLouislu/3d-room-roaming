@@ -27,7 +27,7 @@ export function AutoTourController({
   progress,
   setProgress,
   isPaused,
-  onComplete,
+  onComplete: _onComplete, // Unused in controller logic now
   customPosition,
   customLookAt,
   onPositionChange,
@@ -227,8 +227,20 @@ export function AutoTourController({
           setCurrentIndex(i => i + 1);
           return 0;
         } else {
-          onComplete();
-          return prev;
+             // Last point finished - Pause and show End UI
+             if (!isPaused) {
+                 // We don't have setIsPaused here, but we pass isPaused prop.
+                 // We need to trigger a state change potentially.
+                 // But this component doesn't control isPaused state directly, parent does.
+                 // We can't call setIsPaused here? 
+                 // Actually TourUI has setIsPaused. AutoTourController props has isPaused but not setter.
+                 // Wait, AutoTourController *does not* receive setIsPaused.
+                 // It receives onComplete.
+                 // Let's call onComplete with a special flag? Or just use a callback?
+                 // Or we can just let it sit at the end.
+                 return currentPoint.duration;
+             }
+             return prev;
         }
       }
       return newProgress;
@@ -259,78 +271,154 @@ export function TourUI({
   setIsPaused, 
   onComplete 
 }: TourUIProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const currentPoint = tourPoints[currentIndex];
   
-  if (!currentPoint) return null;
-  
-  return (
-    <div className="fixed top-4 left-4 z-50 pointer-events-auto">
-      <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-4 w-72">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex-1">
-            <h3 className="text-lg font-bold text-gray-800">
-              {currentPoint.title}
-            </h3>
-            <p className="text-gray-600 text-sm mt-1">
-              {currentPoint.description}
-            </p>
-          </div>
-          <div className="ml-3 text-sm text-gray-500">
-            {currentIndex + 1} / {tourPoints.length}
-          </div>
-        </div>
-        
-        <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
-          <div 
-            className="bg-blue-600 h-2 rounded-full transition-all duration-100"
-            style={{ width: `${(progress / currentPoint.duration) * 100}%` }}
-          />
-        </div>
-        
-        <div className="flex flex-col gap-2">
-          <button
-            onClick={() => setIsPaused(!isPaused)}
-            className="w-full px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition"
-          >
-            {isPaused ? '▶️ Resume' : '⏸️ Pause'}
-          </button>
+  // Check if tour is finished
+  const isFinished = currentIndex === tourPoints.length - 1 && progress >= currentPoint.duration;
+
+  if (isFinished) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl transform transition-all scale-100">
+          <h2 className="text-3xl font-black text-gray-900 mb-2">Tour Complete!</h2>
+          <p className="text-gray-600 mb-8">You've seen all the highlights. What would you like to do next?</p>
           
-          <div className="flex gap-2">
-            <button
+          <div className="flex flex-col gap-3">
+             <button
               onClick={() => {
-                if (currentIndex > 0) {
-                  setCurrentIndex(i => i - 1);
-                  setProgress(0);
-                }
+                setCurrentIndex(() => 0);
+                setProgress(0);
+                setIsPaused(false);
               }}
-              className="flex-1 px-3 py-2 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={currentIndex <= 0}
+              className="w-full py-3 px-6 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition"
             >
-              ⏮️ Previous
+              🔄 Replay Tour
             </button>
-            
-            <button
-              onClick={() => {
-                if (currentIndex < tourPoints.length - 1) {
-                  setCurrentIndex(i => i + 1);
-                  setProgress(0);
-                }
-              }}
-              className="flex-1 px-3 py-2 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={currentIndex >= tourPoints.length - 1}
-            >
-              ⏭️ Next
-            </button>
-            
             <button
               onClick={onComplete}
-              className="flex-1 px-3 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition"
+              className="w-full py-3 px-6 bg-white text-gray-900 border-2 border-gray-200 font-bold rounded-xl hover:bg-gray-50 transition"
             >
-              ⏹️ Skip
+              🦅 Free Explore
             </button>
           </div>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="fixed top-16 left-4 z-40 pointer-events-auto">
+      {!isExpanded ? (
+        <div 
+          className="group relative cursor-pointer"
+          onClick={() => setIsExpanded(true)}
+        >
+          <div className="absolute inset-0 bg-black/20 blur-xl opacity-0 group-hover:opacity-100 transition duration-500 rounded-full" />
+          <h1 className="relative text-4xl font-black text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] tracking-tight">
+            {currentIndex + 1}. {currentPoint.title}
+          </h1>
+          <div className="text-white/80 text-sm font-medium mt-1 drop-shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
+            Click to controls
+          </div>
+        </div>
+      ) : (
+        <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-4 w-80 animate-in fade-in slide-in-from-left-4 duration-300">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-gray-900 leading-tight">
+                {currentPoint.title}
+              </h3>
+              <p className="text-gray-600 text-sm mt-1 leading-relaxed">
+                {currentPoint.description}
+              </p>
+            </div>
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsExpanded(false);
+              }}
+              className="ml-2 p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 6 6 18" />
+                <path d="m6 6 12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3 mb-4 text-sm font-medium text-gray-500">
+            <span className="bg-gray-100 px-2 py-1 rounded">
+              View {currentIndex + 1} of {tourPoints.length}
+            </span>
+          </div>
+          
+          <div className="w-full bg-gray-100 rounded-full h-1.5 mb-6 overflow-hidden">
+            <div 
+              className="bg-blue-600 h-full rounded-full transition-all duration-100 ease-linear"
+              style={{ width: `${(progress / currentPoint.duration) * 100}%` }}
+            />
+          </div>
+          
+          <div className="space-y-3">
+            <button
+              onClick={() => setIsPaused(!isPaused)}
+              className={`w-full px-4 py-3 text-white text-sm font-bold rounded-xl transition shadow-sm flex items-center justify-center gap-2 ${
+                isPaused 
+                  ? 'bg-blue-600 hover:bg-blue-700 active:scale-[0.98]' 
+                  : 'bg-orange-500 hover:bg-orange-600 active:scale-[0.98]'
+              }`}
+            >
+              {isPaused ? (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  Resume Tour
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                  Pause Tour
+                </>
+              )}
+            </button>
+            
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                onClick={() => {
+                  if (currentIndex > 0) {
+                    setCurrentIndex(i => i - 1);
+                    setProgress(0);
+                  }
+                }}
+                disabled={currentIndex <= 0}
+                className="flex flex-col items-center justify-center gap-1 px-2 py-2 bg-white border border-gray-200 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50 hover:border-gray-300 disabled:opacity-40 disabled:hover:bg-white transition"
+              >
+                Previous
+              </button>
+              
+              <button
+                onClick={() => {
+                  if (currentIndex < tourPoints.length - 1) {
+                    setCurrentIndex(i => i + 1);
+                    setProgress(0);
+                  }
+                }}
+                disabled={currentIndex >= tourPoints.length - 1}
+                className="flex flex-col items-center justify-center gap-1 px-2 py-2 bg-white border border-gray-200 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50 hover:border-gray-300 disabled:opacity-40 disabled:hover:bg-white transition"
+              >
+                Next
+              </button>
+              
+              <button
+                onClick={onComplete}
+                className="flex flex-col items-center justify-center gap-1 px-2 py-2 bg-white border border-red-100 text-red-600 text-xs font-semibold rounded-lg hover:bg-red-50 hover:border-red-200 transition"
+              >
+                End Tour
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -101,7 +101,8 @@ function AppImproved() {
       setTourIndex(0);
       setTourProgress(0);
       setTourPaused(false);
-      setDebugMode(true);
+      setTourPaused(false);
+      setDebugMode(false);
     }
   };
 
@@ -250,6 +251,17 @@ function AppImproved() {
           onApplyChanges={handleApplyChanges}
           livePosition={tourPaused ? currentCameraPos : undefined}
         />
+      )}
+
+      {tourEnabled && (
+        <div className="fixed top-4 left-4 z-50 flex gap-2">
+            <button
+               onClick={() => setDebugMode(!debugMode)}
+               className="px-4 py-2 bg-purple-600 text-white text-sm font-bold rounded-full shadow-lg hover:bg-purple-700 transition"
+            >
+              {debugMode ? '🔧 Hide Debug' : '🔧 Debug Panel'}
+            </button>
+        </div>
       )}
 
       {tourEnabled && !debugMode && (
