@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { RigidBody, CapsuleCollider, RapierRigidBody } from '@react-three/rapier';
 import { useKeyboard } from '../../hooks/useKeyboard';
@@ -23,17 +23,16 @@ export const PlayerImproved = ({ viewMode = 'third-person' }: PlayerImprovedProp
   const { camera, gl } = useThree();
   const { forward, backward, left, right } = useKeyboard();
   
-  const [yaw, setYaw] = useState(Math.PI);
-  const [pitch, setPitch] = useState(0);
-  const [isRunning, setIsRunning] = useState(false);
-  const mouseMovement = useRef({ x: 0, y: 0 });
+  const yaw = useRef(Math.PI);
+  const pitch = useRef(0);
+  const isRunning = useRef(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Shift') setIsRunning(true);
+      if (e.key === 'Shift') isRunning.current = true;
     };
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key === 'Shift') setIsRunning(false);
+      if (e.key === 'Shift') isRunning.current = false;
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -48,14 +47,9 @@ export const PlayerImproved = ({ viewMode = 'third-person' }: PlayerImprovedProp
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (e.buttons === 2) {
-        mouseMovement.current.x = e.movementX;
-        mouseMovement.current.y = e.movementY;
-
-        setYaw(prev => prev - e.movementX * MOUSE_SENSITIVITY);
-        setPitch(prev => {
-          const newPitch = prev - e.movementY * MOUSE_SENSITIVITY;
-          return Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, newPitch));
-        });
+        yaw.current -= e.movementX * MOUSE_SENSITIVITY;
+        const newPitch = pitch.current + e.movementY * MOUSE_SENSITIVITY;
+        pitch.current = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, newPitch));
       }
     };
 
@@ -80,7 +74,7 @@ export const PlayerImproved = ({ viewMode = 'third-person' }: PlayerImprovedProp
   useFrame(() => {
     if (!rigidBodyRef.current) return;
 
-    const speed = isRunning ? RUN_SPEED : WALK_SPEED;
+    const speed = isRunning.current ? RUN_SPEED : WALK_SPEED;
     frontVector.set(0, 0, Number(backward) - Number(forward));
     sideVector.set(Number(left) - Number(right), 0, 0);
     
@@ -89,7 +83,7 @@ export const PlayerImproved = ({ viewMode = 'third-person' }: PlayerImprovedProp
       .normalize()
       .multiplyScalar(speed);
 
-    direction.applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+    direction.applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw.current);
 
     const linvel = rigidBodyRef.current.linvel();
     rigidBodyRef.current.setLinvel({ x: direction.x, y: linvel.y, z: direction.z }, true);
@@ -98,15 +92,15 @@ export const PlayerImproved = ({ viewMode = 'third-person' }: PlayerImprovedProp
 
     if (viewMode === 'first-person') {
       camera.position.set(translation.x, translation.y + CAMERA_HEIGHT, translation.z);
-      camera.rotation.set(pitch, yaw, 0);
+      camera.rotation.set(pitch.current, yaw.current, 0);
     } else {
       const cameraOffset = new THREE.Vector3(
         0,
         CAMERA_HEIGHT + 2,
         CAMERA_OFFSET_THIRD_PERSON
       );
-      cameraOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
-      cameraOffset.applyAxisAngle(new THREE.Vector3(1, 0, 0), pitch * 0.3);
+      cameraOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw.current);
+      cameraOffset.applyAxisAngle(new THREE.Vector3(1, 0, 0), pitch.current * 0.3);
 
       camera.position.set(
         translation.x + cameraOffset.x,

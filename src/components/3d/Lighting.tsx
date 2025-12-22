@@ -6,17 +6,17 @@ export const Lighting = () => {
 
   return (
     <>
-      <ambientLight intensity={isNight ? 0.15 : 0.4} />
+      <ambientLight intensity={isNight ? 0.15 : (isLow ? 0.8 : 0.4)} />
       <hemisphereLight
         color={isNight ? '#1a1a2e' : '#87CEEB'}
         groundColor={isNight ? '#0f0f1e' : '#5d9e58'}
-        intensity={0.6}
+        intensity={isLow ? 0.4 : 0.6}
       />
       {!isNight && (
         <>
           <directionalLight
             position={[30, 40, 20]}
-            intensity={1.8}
+            intensity={isLow ? 0.8 : 1.8}
             castShadow={!isLow}
             shadow-mapSize={isLow ? [512, 512] : [2048, 2048]}
             shadow-camera-far={100}
@@ -26,11 +26,13 @@ export const Lighting = () => {
             shadow-camera-bottom={-30}
             shadow-bias={-0.0001}
           />
-          <directionalLight
-            position={[-20, 30, 15]}
-            intensity={isLow ? 0.2 : 0.5}
-            color="#ffeedd"
-          />
+          {!isLow && (
+            <directionalLight
+              position={[-20, 30, 15]}
+              intensity={0.5}
+              color="#ffeedd"
+            />
+          )}
         </>
       )}
       {isNight && (
@@ -42,7 +44,9 @@ export const Lighting = () => {
             castShadow={!isLow}
             shadow-mapSize={isLow ? [256, 256] : [1024, 1024]}
           />
-          <pointLight position={[0, 3, 10]} intensity={isLow ? 5 : 15} color="#ffaa00" distance={15} castShadow={!isLow} />
+          {!isLow && (
+            <pointLight position={[0, 3, 10]} intensity={15} color="#ffaa00" distance={15} castShadow={true} />
+          )}
           {!isLow && (
             <>
               <pointLight position={[-8, 2, -5]} intensity={8} color="#00aaff" distance={15} />

@@ -16,6 +16,7 @@ interface AutoTourControllerProps {
   customPosition?: [number, number, number];
   customLookAt?: [number, number, number];
   onPositionChange?: (pos: [number, number, number]) => void;
+  onLookAtChange?: (lookAt: [number, number, number]) => void;
 }
 
 export function AutoTourController({ 
@@ -29,7 +30,8 @@ export function AutoTourController({
   onComplete,
   customPosition,
   customLookAt,
-  onPositionChange
+  onPositionChange,
+  onLookAtChange
 }: AutoTourControllerProps) {
   const { camera, gl } = useThree();
   const keysRef = useRef<Set<string>>(new Set());
@@ -71,7 +73,7 @@ export function AutoTourController({
 
       const sensitivity = performanceTier === 'low' ? 0.002 : 0.0015;
       rotationRef.current.yaw += e.movementX * sensitivity;
-      rotationRef.current.pitch -= e.movementY * sensitivity;
+      rotationRef.current.pitch += e.movementY * sensitivity;
       rotationRef.current.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, rotationRef.current.pitch));
     };
 
@@ -90,6 +92,9 @@ export function AutoTourController({
     };
   }, [isPaused, isMouseDown, gl.domElement, performanceTier]);
 
+  const prevIndexRef = useRef(currentIndex);
+
+  // Sync rotation refs when tour point changes
   useEffect(() => {
     if (!isPaused && currentPoint) {
       const direction = new Vector3(...currentPoint.lookAt).sub(new Vector3(...currentPoint.position)).normalize();
@@ -98,12 +103,54 @@ export function AutoTourController({
     }
   }, [isPaused, currentPoint]);
 
+  // When pausing, properly sync the generic camera position state
+  useEffect(() => {
+    if (isPaused) {
+      if (onPositionChange) {
+        onPositionChange([
+          camera.position.x,
+          camera.position.y,
+          camera.position.z
+        ]);
+      }
+      const euler = new Euler().setFromQuaternion(camera.quaternion, 'YXZ');
+      rotationRef.current.yaw = euler.y;
+      rotationRef.current.pitch = euler.x;
+    }
+  }, [isPaused, camera, onPositionChange]);
+
+  // Snap camera when index changes while paused
+  useEffect(() => {
+    if (prevIndexRef.current !== currentIndex) {
+      if (isPaused && currentPoint) {
+        camera.position.set(...currentPoint.position);
+        camera.lookAt(...currentPoint.lookAt);
+        
+        const direction = new Vector3(...currentPoint.lookAt).sub(new Vector3(...currentPoint.position)).normalize();
+        rotationRef.current.yaw = Math.atan2(direction.x, direction.z);
+        rotationRef.current.pitch = Math.asin(direction.y);
+
+        if (onPositionChange) {
+          onPositionChange([...currentPoint.position]);
+        }
+      }
+      prevIndexRef.current = currentIndex;
+    }
+  }, [currentIndex, isPaused, currentPoint, camera, onPositionChange]);
+
+  // Apply custom position immediately if provided (e.g. from debug panel Apply)
+  useEffect(() => {
+      if (customPosition) {
+        camera.position.set(...customPosition);
+        if (customLookAt) camera.lookAt(...customLookAt);
+      }
+  }, [customPosition, customLookAt, camera]);
+
   useFrame((_state, delta) => {
     if (!enabled || !currentPoint) return;
 
     if (isPaused) {
       const keys = keysRef.current;
-      // Reduced speed for better precision when finding view angles
       const baseSpeed = performanceTier === 'low' ? 2.0 : 3.0; 
       const moveSpeed = keys.has('shift') ? baseSpeed * 4.0 : baseSpeed;
       
@@ -126,9 +173,11 @@ export function AutoTourController({
       if (keys.has('q')) movement.y += moveSpeed * delta;
       if (keys.has('e')) movement.y -= moveSpeed * delta;
 
-      if (movement.length() > 0) {
-        camera.position.add(movement);
-        
+      if (movement.length() > 0 || isMouseDown) {
+        if (movement.length() > 0) {
+          camera.position.add(movement);
+        }
+
         if (onPositionChange) {
           onPositionChange([
             camera.position.x,
@@ -136,8 +185,19 @@ export function AutoTourController({
             camera.position.z
           ]);
         }
-      }
 
+        if (onLookAtChange) {
+           const direction = new Vector3(0, 0, -1);
+           direction.applyEuler(new Euler(
+             rotationRef.current.pitch, 
+             rotationRef.current.yaw, 
+             0, 
+             'YXZ'
+           ));
+           const target = camera.position.clone().add(direction.multiplyScalar(10));
+           onLookAtChange([target.x, target.y, target.z]);
+        }
+      }
       return;
     }
     
@@ -174,7 +234,7 @@ export function AutoTourController({
       return newProgress;
     });
   });
-  
+
   return null;
 }
 

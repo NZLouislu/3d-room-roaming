@@ -1,5 +1,4 @@
 import { Canvas, useThree } from '@react-three/fiber';
-import { Sky } from '@react-three/drei';
 import { Physics } from '@react-three/rapier';
 import { useState, useEffect } from 'react';
 import * as THREE from 'three';
@@ -161,14 +160,14 @@ function AppImproved() {
       {rendererReady && (
         <Canvas 
           shadows={performanceTier === 'high'}
-          dpr={isMobile ? 1.0 : (performanceTier === 'low' ? 0.75 : [1, 1.5])}
+          dpr={isMobile ? 1.0 : (performanceTier === 'low' ? 0.5 : (performanceTier === 'medium' ? [0.75, 1] : [1, 1.5]))}
           camera={{ 
             fov: 45, 
             position: mode === 'auto-tour' ? [0, 28, -40] : [0, 12, 30] 
           }}
           gl={{
-            antialias: !isMobile && performanceTier !== 'low',
-            powerPreference: isMobile ? 'default' : 'high-performance',
+            antialias: !isMobile && performanceTier === 'high',
+            powerPreference: 'high-performance',
             alpha: false,
             stencil: false,
             depth: true,
@@ -184,23 +183,22 @@ function AppImproved() {
               maxTextureSize: glContext.getParameter(glContext.MAX_TEXTURE_SIZE)
             });
             gl.shadowMap.enabled = performanceTier === 'high';
-            gl.shadowMap.type = THREE.PCFSoftShadowMap;
-            gl.toneMapping = THREE.ACESFilmicToneMapping;
-            gl.toneMappingExposure = 1;
+            if (performanceTier === 'high') {
+              gl.shadowMap.type = THREE.PCFSoftShadowMap;
+              gl.toneMapping = THREE.ACESFilmicToneMapping;
+              gl.toneMappingExposure = 1;
+            } else {
+               gl.shadowMap.autoUpdate = false;
+               gl.shadowMap.needsUpdate = false;
+               gl.toneMapping = THREE.NoToneMapping;
+            }
           }}
           onError={(error) => {
             console.error('[Canvas] Error during initialization:', error);
           }}
         >
-        <Sky sunPosition={[100, 20, 100]} />
-        <ambientLight intensity={0.6} />
-        <directionalLight
-          position={[10, 20, 10]}
-          intensity={1}
-          castShadow={performanceTier !== 'low'}
-          shadow-mapSize={performanceTier === 'high' ? [2048, 2048] : [1024, 1024]}
-        />
-        <Physics debug={false}>
+        {/* Sky and Lights are handled in ExperienceImproved */}
+        <Physics debug={false} timeStep={1/30}>
           <ExperienceImproved 
             viewMode={viewMode} 
             enablePlayer={mode !== 'auto-tour' && mode !== 'bird-view'} 
@@ -227,6 +225,7 @@ function AppImproved() {
             customPosition={customPosition}
             customLookAt={customLookAt}
             onPositionChange={setCurrentCameraPos}
+            onLookAtChange={setCustomLookAt}
           />
         )}
         

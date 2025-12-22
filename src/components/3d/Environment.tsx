@@ -2,10 +2,15 @@ import { Sky } from '@react-three/drei';
 import { useStore } from '../../hooks/useStore';
 
 export const Environment = () => {
-  const isNight = useStore((state) => state.isNight);
+  const { isNight, performanceTier } = useStore();
+  const isLow = performanceTier === 'low';
 
   const daySunPosition: [number, number, number] = [100, 20, 100];
   const nightSunPosition: [number, number, number] = [10, -5, 10];
+
+  if (isLow) {
+      return <color attach="background" args={[isNight ? '#0f0f1e' : '#87CEEB']} />;
+  }
 
   return (
     <Sky
