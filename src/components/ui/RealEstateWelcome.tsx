@@ -15,138 +15,159 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900 z-[100] flex items-center justify-center p-2 sm:p-4 overflow-hidden">
-      {/* Background Video Layer */}
+    <div className="fixed inset-0 bg-black z-[100] font-sans text-white overflow-hidden selection:bg-blue-500/30">
+
+      {/* 1. Immersive Video Background */}
       <div className="absolute inset-0 z-0">
         <video
           autoPlay
           muted
           loop
           playsInline
-          className="w-full h-full object-cover opacity-40 grayscale-[0.2]"
+          className="w-full h-full object-cover scale-[1.02] filter brightness-[0.7] contrast-[1.1]"
         >
           <source src="/videos/3D-SmartTour-Showcase.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-slate-900" />
+        {/* Cinematic Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/60 pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)] pointer-events-none" />
       </div>
 
-      <div className="relative z-10 bg-white/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-[0_0_100px_rgba(0,0,0,0.5)] max-w-4xl w-full mx-auto my-auto overflow-hidden">
+      {/* 2. Main Content Layout */}
+      <div className="relative z-10 h-full flex flex-col justify-between px-6 py-8 md:px-12 md:py-12 max-w-[1920px] mx-auto">
 
-        <div className="bg-gradient-to-r from-blue-600/90 to-indigo-600/90 px-6 py-6 sm:px-8 sm:py-10 text-center">
-          <div className="inline-block px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-white text-[10px] sm:text-xs font-bold tracking-[0.2em] mb-4 uppercase">
-            Future of Real Estate
-          </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight mb-4 drop-shadow-lg">
-            SMART TOUR 3D
-          </h1>
-          <p className="text-blue-100 text-base sm:text-lg max-w-2xl mx-auto font-medium opacity-90">
-            沉浸式三维房产预览系统：融合 React 18 与物理引擎，提供电影级漫游与程序化视频生成的全新看房体验。
-          </p>
-        </div>
-
-        <div className="p-4 sm:p-6 md:p-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-
-            <button
-              onClick={() => handleStart('auto-tour')}
-              className="group relative overflow-hidden rounded-xl sm:rounded-2xl border-2 border-blue-200 hover:border-blue-500 transition-all duration-300 p-4 sm:p-6 md:p-8 text-left bg-gradient-to-br from-blue-50 to-indigo-50 hover:shadow-xl"
-            >
-              <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4">🎬</div>
-              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-2">
-                Guided Tour
-              </h3>
-              <p className="text-gray-600 mb-3 sm:mb-4 text-xs sm:text-sm">
-                Sit back and enjoy an automated tour showcasing the best features
-              </p>
-              <ul className="text-xs text-gray-500 space-y-1 hidden xs:block">
-                <li>✓ Exterior 360° view</li>
-                <li>✓ Key rooms highlights</li>
-                <li>✓ Perfect for first-time</li>
-              </ul>
-              <div className="mt-4 inline-block bg-blue-600 text-white px-4 sm:px-6 py-2 rounded-full text-sm font-medium group-hover:bg-blue-700 transition w-full text-center sm:w-auto">
-                Start Tour
-              </div>
-            </button>
-
-            <button
-              onClick={() => handleStart('free-explore')}
-              className="group relative overflow-hidden rounded-xl sm:rounded-2xl border-2 border-green-200 hover:border-green-500 transition-all duration-300 p-4 sm:p-6 md:p-8 text-left bg-gradient-to-br from-green-50 to-emerald-50 hover:shadow-xl"
-            >
-              <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4">🎮</div>
-              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-2">
-                Free Explore
-              </h3>
-              <p className="text-gray-600 mb-3 sm:mb-4 text-xs sm:text-sm">
-                Navigate freely and explore every corner at your own pace
-              </p>
-              <ul className="text-xs text-gray-500 space-y-1 hidden xs:block">
-                <li>✓ WASD + Mouse controls</li>
-                <li>✓ Quick viewpoint jumps</li>
-                <li>✓ Measure rooms yourself</li>
-              </ul>
-              <div className="mt-4 inline-block bg-green-600 text-white px-4 sm:px-6 py-2 rounded-full text-sm font-medium group-hover:bg-green-700 transition w-full text-center sm:w-auto">
-                Start Exploring
-              </div>
-            </button>
-
-            <button
-              onClick={() => handleStart('bird-view')}
-              className="group relative overflow-hidden rounded-xl sm:rounded-2xl border-2 border-purple-200 hover:border-purple-500 transition-all duration-300 p-4 sm:p-6 md:p-8 text-left bg-gradient-to-br from-purple-50 to-fuchsia-50 hover:shadow-xl sm:col-span-2 lg:col-span-1"
-            >
-              <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4">🦅</div>
-              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-2">
-                Bird View
-              </h3>
-              <p className="text-gray-600 mb-3 sm:mb-4 text-xs sm:text-sm">
-                Get a complete overhead perspective of the entire property layout
-              </p>
-              <ul className="text-xs text-gray-500 space-y-1 hidden xs:block">
-                <li>✓ Top-down perspective</li>
-                <li>✓ Record room coordinates</li>
-                <li>✓ Understand layout</li>
-              </ul>
-              <div className="mt-4 inline-block bg-purple-600 text-white px-4 sm:px-6 py-2 rounded-full text-sm font-medium group-hover:bg-purple-700 transition w-full text-center sm:w-auto">
-                Start View
-              </div>
-            </button>
-
-          </div>
-
-          <div className="bg-gray-50 rounded-xl p-4 sm:p-6">
-            <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
-              <span>🏠</span>
-              Property Highlights
-            </h4>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 text-center sm:text-left">
-              <div>
-                <div className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Bedrooms</div>
-                <div className="text-lg sm:text-2xl font-bold text-blue-600">4</div>
-              </div>
-              <div>
-                <div className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Bathrooms</div>
-                <div className="text-lg sm:text-2xl font-bold text-blue-600">3</div>
-              </div>
-              <div>
-                <div className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Floors</div>
-                <div className="text-lg sm:text-2xl font-bold text-blue-600">2</div>
-              </div>
-              <div>
-                <div className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Living Area</div>
-                <div className="text-lg sm:text-2xl font-bold text-blue-600 whitespace-nowrap">280m²</div>
-              </div>
-              <div>
-                <div className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Garage</div>
-                <div className="text-lg sm:text-2xl font-bold text-blue-600">Double</div>
-              </div>
-              <div>
-                <div className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Garden</div>
-                <div className="text-lg sm:text-2xl font-bold text-blue-600">Yes</div>
-              </div>
+        {/* Top Header Section */}
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 animate-fade-in-down">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="h-[2px] w-8 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+              <span className="text-blue-400 font-bold tracking-[0.2em] text-xs uppercase">Future of Real Estate</span>
             </div>
+            <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none mb-2 drop-shadow-2xl">
+              SMART TOUR <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">3D</span>
+            </h1>
+            <p className="text-gray-300 max-w-xl text-lg font-light leading-relaxed border-l-2 border-white/20 pl-4 mt-4 bg-white/5 backdrop-blur-sm py-2 pr-4 rounded-r-lg">
+              Immersive 3D Real Estate System: Fusing React 18 with physics engines to deliver cinematic tours and programmatic video generation for a revolutionary viewing experience.
+            </p>
           </div>
 
+          {/* Stats Bar (Moved to top right for balance) */}
+          <div className="hidden lg:flex gap-8 bg-white/5 backdrop-blur-md px-8 py-4 rounded-2xl border border-white/10 shadow-2xl">
+            <StatItem icon="🛏️" value="4" label="Bedrooms" />
+            <StatItem icon="🚿" value="3" label="Bathrooms" />
+            <StatItem icon="📐" value="280m²" label="Living Area" />
+            <StatItem icon="🚗" value="Double" label="Garage" />
+          </div>
+        </header>
+
+        {/* Middle Spacer - Leaves room for the video to shine */}
+        <div className="flex-grow min-h-[100px]" />
+
+        {/* Bottom Interaction Section */}
+        <div className="w-full animate-fade-in-up">
+          <h2 className="text-xl md:text-2xl font-semibold mb-6 flex items-center gap-3 text-white/90">
+            <span className="flex items-center justify-center w-8 h-8 rounded-full border border-white/30 text-sm">▶</span>
+            Select Viewing Mode
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <ModeCard
+              title="Guided Tour"
+              icon="🎬"
+              desc="Sit back regarding an automated cinematic tour of highlights."
+              features={['Exterior 360°', 'Key Highlights', 'Cinematic Path']}
+              color="blue"
+              onClick={() => handleStart('auto-tour')}
+            />
+            <ModeCard
+              title="Free Explore"
+              icon="🎮"
+              desc="Navigate freely using WASD keys like a video game."
+              features={['Full Control', 'Walk Everywhere', ' Interactive']}
+              color="green"
+              onClick={() => handleStart('free-explore')}
+            />
+            <ModeCard
+              title="Bird View"
+              icon="🦅"
+              desc="Get a complete overhead perspective of the layout."
+              features={['Top-down View', 'Layout Overview', 'RoomCoords']}
+              color="purple"
+              onClick={() => handleStart('bird-view')}
+            />
+          </div>
         </div>
+
       </div>
     </div>
   );
 }
+
+// Sub-components for cleaner code
+
+function ModeCard({ title, icon, desc, features, color, onClick }: any) {
+  const colors: any = {
+    blue: "hover:border-blue-500/50 hover:bg-blue-900/20 group-hover:text-blue-400",
+    green: "hover:border-green-500/50 hover:bg-green-900/20 group-hover:text-green-400",
+    purple: "hover:border-purple-500/50 hover:bg-purple-900/20 group-hover:text-purple-400",
+  };
+
+  const btnColors: any = {
+    blue: "bg-blue-600 hover:bg-blue-500",
+    green: "bg-green-600 hover:bg-green-500",
+    purple: "bg-purple-600 hover:bg-purple-500",
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      className={`group relative text-left p-6 rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl transition-all duration-500 hover:translate-y-[-4px] hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] ${colors[color]}`}
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
+
+      <div className="relative z-10">
+        <div className="flex justify-between items-start mb-4">
+          <div className="p-3 bg-white/5 rounded-xl text-3xl group-hover:scale-110 transition-transform duration-300 border border-white/10">
+            {icon}
+          </div>
+          <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/5 text-white/60 group-hover:bg-white/10 group-hover:text-white transition-colors`}>
+            Ready
+          </div>
+        </div>
+
+        <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-white transition-colors">
+          {title}
+        </h3>
+
+        <p className="text-gray-400 text-sm mb-6 leading-relaxed min-h-[2.5em]">
+          {desc}
+        </p>
+
+        <div className="space-y-3 border-t border-white/10 pt-4 mb-6">
+          {features.map((f: string, i: number) => (
+            <div key={i} className="flex items-center text-xs text-gray-400 group-hover:text-gray-300">
+              <span className={`w-1.5 h-1.5 rounded-full mr-2 ${btnColors[color].split(' ')[0]}`} />
+              {f}
+            </div>
+          ))}
+        </div>
+
+        <div className={`w-full py-3 rounded-xl text-center font-semibold text-sm transition-all duration-300 shadow-lg ${btnColors[color]} text-white opacity-90 group-hover:opacity-100 group-hover:shadow-${color}-500/30`}>
+          Enter Mode
+        </div>
+      </div>
+    </button>
+  );
+}
+
+function StatItem({ icon, value, label }: any) {
+  return (
+    <div className="text-center">
+      <div className="text-xl md:text-2xl font-bold text-white mb-0.5">{value}</div>
+      <div className="text-[10px] uppercase tracking-widest text-gray-400 font-medium flex items-center justify-center gap-1">
+        <span className="opacity-70">{icon}</span> {label}
+      </div>
+    </div>
+  );
+}
+
