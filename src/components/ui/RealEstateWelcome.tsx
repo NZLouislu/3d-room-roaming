@@ -14,6 +14,13 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
     onStart(mode);
   };
 
+  const handleVideoLoad = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+    const video = e.currentTarget;
+    video.play().catch(err => {
+      console.warn('Video autoplay failed:', err);
+    });
+  };
+
   return (
     <div className="fixed inset-0 bg-black z-[100] font-sans text-white overflow-hidden selection:bg-blue-500/30">
 
@@ -26,6 +33,7 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
           playsInline
           poster="/videos/poster.jpg"
           preload="auto"
+          onLoadedData={handleVideoLoad}
           className="w-full h-full object-cover scale-[1.02] filter brightness-[0.7] contrast-[1.1]"
         >
           <source src="/videos/3D-SmartTour-web-bg.mp4" type="video/mp4" />
