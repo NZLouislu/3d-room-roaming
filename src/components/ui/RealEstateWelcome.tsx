@@ -17,13 +17,19 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
   return (
     <div className="fixed inset-0 bg-black z-[100] font-sans text-white overflow-hidden selection:bg-blue-500/30">
 
-      {/* 1. Immersive Background */}
+      {/* 1. Immersive Video Background */}
       <div className="absolute inset-0 z-0">
-        <img
-          src="/videos/poster.jpg"
-          alt="3D Tour Background"
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="/videos/poster.jpg"
+          preload="auto"
           className="w-full h-full object-cover scale-[1.02] filter brightness-[0.7] contrast-[1.1]"
-        />
+        >
+          <source src="/videos/3D-SmartTour-web-bg.mp4" type="video/mp4" />
+        </video>
         {/* Cinematic Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/60 pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)] pointer-events-none" />

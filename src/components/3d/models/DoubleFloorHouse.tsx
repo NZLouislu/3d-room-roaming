@@ -51,9 +51,6 @@ function HouseMesh({ performanceTier }: { performanceTier: string }) {
 function DoubleFloorHouseInner(props: JSX.IntrinsicElements['group']) {
   const performanceTier = useStore((state) => state.performanceTier);
 
-  // We use hardcoded dimensions for the house colliders to ensure they are 
-  // ready immediately and don't depend on async model loading, which 
-  // can cause "expected instance of a" errors in Rapier/Safari.
   const w = HOUSE_SIZE.x;
   const h = HOUSE_SIZE.y;
   const d = HOUSE_SIZE.z;
@@ -86,4 +83,3 @@ function DoubleFloorHouseInner(props: JSX.IntrinsicElements['group']) {
 export function DoubleFloorHouseWithSuspense(props: JSX.IntrinsicElements['group']) {
   return <DoubleFloorHouseInner {...props} />;
 }
-
