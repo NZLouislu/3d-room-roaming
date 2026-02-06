@@ -26,7 +26,7 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
           playsInline
           className="w-full h-full object-cover scale-[1.02] filter brightness-[0.7] contrast-[1.1]"
         >
-          <source src="/videos/web-bg.mp4" type="video/mp4" />
+          <source src="/videos/3D-SmartTour-web-bg.mp4" type="video/mp4" />
         </video>
         {/* Cinematic Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/60 pointer-events-none" />
