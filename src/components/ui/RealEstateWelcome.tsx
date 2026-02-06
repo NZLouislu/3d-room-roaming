@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface WelcomeProps {
   onStart: (mode: 'auto-tour' | 'free-explore' | 'bird-view') => void;
@@ -6,6 +6,42 @@ interface WelcomeProps {
 
 export function RealEstateWelcome({ onStart }: WelcomeProps) {
   const [visible, setVisible] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const attemptPlay = async () => {
+      try {
+        console.log('Attempting to play video...');
+        console.log('Video src:', video.src);
+        console.log('Video readyState:', video.readyState);
+
+        await video.play();
+        console.log('✅ Video playing successfully');
+      } catch (err) {
+        console.error('❌ Video autoplay failed:', err);
+      }
+    };
+
+    if (video.readyState >= 3) {
+      attemptPlay();
+    } else {
+      video.addEventListener('loadeddata', attemptPlay);
+      video.addEventListener('canplay', attemptPlay);
+    }
+
+    video.addEventListener('error', (e) => {
+      console.error('Video error event:', e);
+      console.error('Video error details:', video.error);
+    });
+
+    return () => {
+      video.removeEventListener('loadeddata', attemptPlay);
+      video.removeEventListener('canplay', attemptPlay);
+    };
+  }, []);
 
   if (!visible) return null;
 
@@ -16,8 +52,9 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
 
   const handleVideoLoad = (e: React.SyntheticEvent<HTMLVideoElement>) => {
     const video = e.currentTarget;
+    console.log('onLoadedData fired, readyState:', video.readyState);
     video.play().catch(err => {
-      console.warn('Video autoplay failed:', err);
+      console.warn('Video autoplay failed in onLoadedData:', err);
     });
   };
 
@@ -27,6 +64,7 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
       {/* 1. Immersive Video Background */}
       <div className="absolute inset-0 z-0">
         <video
+          ref={videoRef}
           autoPlay
           muted
           loop
