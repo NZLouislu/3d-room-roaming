@@ -16,6 +16,14 @@ export const RemotionRoot: React.FC = () => {
                 width={1920}
                 height={1080}
             />
+            <Composition
+                id="WebBackground"
+                component={TourVideo}
+                durationInFrames={Math.floor(totalDurationSeconds * 24)}
+                fps={24}
+                width={1280}
+                height={720}
+            />
         </>
     );
 };
