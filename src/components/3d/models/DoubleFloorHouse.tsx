@@ -1,12 +1,13 @@
 import { useGLTF } from '@react-three/drei';
+import { resolveAsset } from '../../../utils/resolveAsset';
 import { RigidBody, CuboidCollider } from '@react-three/rapier';
 import { Suspense, useEffect } from 'react';
 import { Box3, Vector3 } from 'three';
 import { useStore } from '../../../hooks/useStore';
 
 export function DoubleFloorHouse(props: JSX.IntrinsicElements['group']) {
-  const { scene } = useGLTF('/models/two-story-house.glb');
-  
+  const { scene } = useGLTF(resolveAsset('/models/two-story-house.glb'));
+
   useEffect(() => {
     if (scene) {
       const box = new Box3().setFromObject(scene);
@@ -16,11 +17,11 @@ export function DoubleFloorHouse(props: JSX.IntrinsicElements['group']) {
       console.log('[House] Model box min:', box.min.toArray(), 'max:', box.max.toArray());
     }
   }, [scene]);
-  
+
   return (
     <group {...props}>
-      <primitive 
-        object={scene} 
+      <primitive
+        object={scene}
         scale={1}
         castShadow
         receiveShadow
@@ -29,17 +30,17 @@ export function DoubleFloorHouse(props: JSX.IntrinsicElements['group']) {
   );
 }
 
-useGLTF.preload('/models/two-story-house.glb');
+useGLTF.preload(resolveAsset('/models/two-story-house.glb'));
 
 const HOUSE_SIZE = { x: 30, y: 20, z: 25 };
 const HOUSE_OFFSET = { x: 146.65, y: 14.11, z: 138.17 };
 
 function HouseMesh({ performanceTier }: { performanceTier: string }) {
-  const { scene } = useGLTF('/models/two-story-house.glb');
-  
+  const { scene } = useGLTF(resolveAsset('/models/two-story-house.glb'));
+
   return (
-    <primitive 
-      object={scene} 
+    <primitive
+      object={scene}
       scale={1}
       castShadow={performanceTier === 'high'}
       receiveShadow={performanceTier === 'high'}
@@ -68,7 +69,7 @@ function DoubleFloorHouseInner(props: JSX.IntrinsicElements['group']) {
       <RigidBody type="fixed" colliders={false}>
         {/* Main Floor */}
         <CuboidCollider args={[w / 2, 0.5, d / 2]} position={[0, -0.25, 0]} />
-        
+
         {/* Second Floor */}
         <CuboidCollider args={[w / 2, 0.5, d / 2]} position={[0, h / 2.1, 0]} />
 

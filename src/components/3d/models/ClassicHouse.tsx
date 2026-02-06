@@ -1,4 +1,5 @@
 import { useGLTF } from '@react-three/drei';
+import { resolveAsset } from '../../../utils/resolveAsset';
 
 type GLTFResult = {
   nodes: Record<string, any>;
@@ -6,8 +7,8 @@ type GLTFResult = {
 };
 
 export function ClassicHouse(props: JSX.IntrinsicElements['group']) {
-  const { nodes, materials } = useGLTF('/models/classic-house.glb') as GLTFResult;
-  
+  const { nodes, materials } = useGLTF(resolveAsset('/models/classic-house.glb')) as GLTFResult;
+
   return (
     <group {...props} dispose={null}>
       <mesh
@@ -20,4 +21,4 @@ export function ClassicHouse(props: JSX.IntrinsicElements['group']) {
   );
 }
 
-useGLTF.preload('/models/classic-house.glb');
+useGLTF.preload(resolveAsset('/models/classic-house.glb'));

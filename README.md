@@ -1,185 +1,87 @@
-# 3D Room Roaming System
+# SMART TOUR 3D: Immersive Property Marketing System
 
-A first-person 3D room exploration application built with React Three Fiber, featuring interactive furniture, dynamic lighting, and physics-based player movement.
+[![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org/)
+[![Three.js](https://img.shields.io/badge/Three.js-r163-black.svg)](https://threejs.org/)
+[![Remotion](https://img.shields.io/badge/Remotion-Video-purple.svg)](https://www.remotion.dev/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## Features
+A high-performance 3D real estate visualization system. It offers a seamless transition between **interactive web roaming** and **programmatically generated cinematic videos**, providing a futuristic solution for real estate digital twins.
 
-- 🎮 **First-Person Controls**: WASD movement with mouse-look camera controls
-- 🪑 **Interactive Furniture**: Click on objects to view detailed information
-- 🌓 **Dynamic Lighting**: Toggle between day and night modes
-- ⚡ **Physics Engine**: Realistic collision detection using Rapier
-- 🎨 **Modern UI**: Beautiful Tailwind-styled interface with smooth animations
-- ✅ **Fully Tested**: Comprehensive unit, integration, and E2E test coverage
+## 📺 Video Showcase
 
-## Tech Stack
-
-- **Frontend Framework**: React 18 + TypeScript
-- **Build Tool**: Vite
-- **3D Engine**: Three.js
-- **3D React Wrapper**: React Three Fiber (R3F)
-- **3D Helpers**: @react-three/drei
-- **Physics**: @react-three/rapier
-- **State Management**: Zustand
-- **Styling**: TailwindCSS
-- **Testing**: Vitest + Playwright
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- npm or yarn
-
-### Installation
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Run unit tests
-npm test
-
-# Run E2E tests (requires dev server running)
-npm run dev  # In one terminal
-cd e2e && npx playwright test  # In another terminal
-```
-
-## Project Structure
-
-```
-src/
-├── components/
-│   ├── 3d/
-│   │   ├── Experience.tsx    # Main 3D scene container
-│   │   ├── Player.tsx         # First-person player controller
-│   │   ├── Room.tsx           # Room geometry with physics
-│   │   ├── Furniture.tsx      # Interactive furniture component
-│   │   └── Lighting.tsx       # Dynamic lighting system
-│   └── ui/
-│       ├── Interface.tsx      # Main UI overlay
-│       └── InfoCard.tsx       # Furniture information panel
-├── hooks/
-│   ├── useKeyboard.ts         # Keyboard input handler
-│   └── useStore.ts            # Zustand state management
-└── App.tsx                    # Application entry point
-```
-
-## Controls
-
-- **W/A/S/D**: Move forward/left/backward/right
-- **Mouse**: Look around (click to lock pointer)
-- **Left Click**: Interact with furniture
-- **Day/Night Button**: Toggle lighting mode
-
-## Testing
-
-### Unit Tests
-
-```bash
-npm test
-```
-
-### E2E Tests
-
-```bash
-# Start dev server
-npm run dev
-
-# In another terminal
-cd e2e
-npx playwright test
-```
-
-## Development
-
-### Adding New Furniture
-
-```tsx
-<Furniture
-  position={[x, y, z]}
-  name="Item Name"
-  price="$999"
-  description="Item description"
-  color="#hexcolor"
-/>
-```
-
-### Modifying Room Layout
-
-Edit `src/components/3d/Room.tsx` to adjust walls, floor, and collision boundaries.
-
-### Customizing Lighting
-
-Modify `src/components/3d/Lighting.tsx` to change day/night lighting configurations.
-
-## Deployment
-
-### Build for Production
-
-```bash
-npm run build
-```
-
-The built files will be in the `dist/` directory.
-
-### Deploy to Vercel
-
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel
-```
-
-### Deploy to Netlify
-
-```bash
-# Build
-npm run build
-
-# Deploy dist folder via Netlify CLI or drag-and-drop
-```
-
-## License
-
-MIT
-
-## Career Development Resources
-
-This project serves as an excellent foundation for entering the **Digital Twin** industry. Based on this codebase, we've created comprehensive career guidance:
-
-### 📚 Documentation
-
-- **[Digital Twin Case Studies](docs/DIGITAL-TWIN-CASES.md)** - 10 real-world examples you can explore today
-- **[AI Impact Career Analysis](docs/AI-IMPACT-CAREER-ANALYSIS.md)** - Why digital twin is a career moat in the AI era
-- **[4-Week Digital Twin Sprint](docs/4-WEEK-DIGITAL-TWIN-SPRINT.md)** - Actionable plan to transition into digital twin development
-
-### 🎯 Career Path Visualization
-
-![AI Career Impact](images/ai_career_impact_chart.png)
-
-### 💡 Key Insights
-
-- **Digital Twin Developer** avg salary: $145K AUD (vs $90K for web dev)
-- **Market growth**: 37.5% CAGR (vs 8% for traditional web)
-- **AI replacement risk**: 25% (vs 80% for CRUD development)
-- **Your advantage**: Already have 80% of required skills with this project!
+![Smart Tour 3D Preview](./public/videos/3D-SmartTour-Showcase.gif)
+> *Note: Programmatically rendered using Remotion at 4K/60fps.*
 
 ---
 
-## Contributing
+## 🌟 Core Features
 
-Contributions are welcome! Please ensure all tests pass before submitting a PR.
+### 1. Interactive 3D Roaming (Web)
+*   **Game-like Exploration**: First-person perspective with WASD controls and physics-based collision (Rapier).
+*   **Dynamic Environments**: Real-time Day/Night switching with photorealistic lighting adjustments.
+*   **Interactive Hotspots**: Clickable furniture/objects with metadata (Price, Description) powered by Zustand.
+*   **Cross-Platform Performance**: Tier-based renderer detection (WebGL2/WebGPU) to ensure 60FPS on both Mobile and Desktop.
 
+### 2. Programmatic Video Production (Remotion)
+*   **Guided Tour Rendering**: Turn 3D navigation points into professional 4K/60fps marketing videos.
+*   **Cinematic Camera**: Smooth step interpolation (Lerp) for movie-quality camera movement.
+*   **Dynamic Overlays**: Real-time HUD and location labels that sync perfectly with the 3D space during rendering.
+*   **One-Click Export**: Generate optimized MP4 showcases directly from code.
+
+### 3. Developer Tools
+*   **Guided Tour Debugger**: Visual tools to record and test camera coordinates in real-time.
+*   **Performance Monitor**: Integrated FPS and memory tracking for scene optimization.
+
+---
+
+## 🛠 Tech Stack
+
+| Component | Technology |
+| :--- | :--- |
+| **Engine** | Three.js / React Three Fiber (R3F) |
+| **Video** | Remotion |
+| **Physics** | @react-three/rapier |
+| **State** | Zustand |
+| **Styling** | TailwindCSS |
+| **Testing** | Vitest / Playwright |
+
+---
+
+## 🚀 Quick Start
+
+### Installation
 ```bash
-npm test
-npm run build
-cd e2e && npx playwright test
+npm install
 ```
+
+### 💻 Running the App (Interactive Mode)
+```bash
+npm run dev
+```
+
+### 🎬 Rendering Video (Remotion Mode)
+*   **Preview**: `npm run video` (Opens Remotion Studio)
+*   **Render MP4**: `npm run video:render` (Exports to `out/3D-SmartTour-Showcase.mp4`)
+
+---
+
+## 📁 Project Structure
+
+```text
+src/
+├── components/3d/    # 3D Elements (Player, House, Lighting)
+├── components/ui/    # HUD & Control Panels
+├── remotion/         # Video Rendering Logic & Compositions
+├── data/             # Tour Points & Scene Configurations
+└── hooks/            # Scene State & Keyboard Logic
+```
+
+---
+
+## 🔮 Future Vision
+This project is part of a larger Digital Twin initiative for Wellington and Auckland real estate, aiming to replace traditional static imagery with fully interactive, AI-optimized virtual environments.
+
+---
+
+## ⚖️ License
+MIT

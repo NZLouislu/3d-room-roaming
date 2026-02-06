@@ -1,4 +1,5 @@
 import { useGLTF } from '@react-three/drei';
+import { resolveAsset } from '../../../utils/resolveAsset';
 
 type GLTFResult = {
   nodes: Record<string, any>;
@@ -6,11 +7,11 @@ type GLTFResult = {
 };
 
 export function TwoStoryHouse(props: JSX.IntrinsicElements['group']) {
-  const gltf = useGLTF('/models/two-story-house.glb');
+  const gltf = useGLTF(resolveAsset('/models/two-story-house.glb'));
   const { nodes, materials } = gltf as unknown as GLTFResult;
-  
+
   const meshKeys = Object.keys(nodes);
-  
+
   return (
     <group {...props} dispose={null}>
       <group rotation={[Math.PI / 2, 0, -Math.PI]}>
@@ -35,4 +36,4 @@ export function TwoStoryHouse(props: JSX.IntrinsicElements['group']) {
   );
 }
 
-useGLTF.preload('/models/two-story-house.glb');
+useGLTF.preload(resolveAsset('/models/two-story-house.glb'));

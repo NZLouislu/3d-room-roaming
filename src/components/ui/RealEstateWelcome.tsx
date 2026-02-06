@@ -6,30 +6,47 @@ interface WelcomeProps {
 
 export function RealEstateWelcome({ onStart }: WelcomeProps) {
   const [visible, setVisible] = useState(true);
-  
+
   if (!visible) return null;
-  
+
   const handleStart = (mode: 'auto-tour' | 'free-explore' | 'bird-view') => {
     setVisible(false);
     onStart(mode);
   };
-  
+
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl max-w-4xl w-full mx-auto my-auto overflow-hidden">
-        
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 sm:px-8 sm:py-6">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white leading-tight">
-            Premium Double Floor House
+    <div className="fixed inset-0 bg-slate-900 z-[100] flex items-center justify-center p-2 sm:p-4 overflow-hidden">
+      {/* Background Video Layer */}
+      <div className="absolute inset-0 z-0">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover opacity-40 grayscale-[0.2]"
+        >
+          <source src="/videos/3D-SmartTour-Showcase.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-slate-900" />
+      </div>
+
+      <div className="relative z-10 bg-white/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-[0_0_100px_rgba(0,0,0,0.5)] max-w-4xl w-full mx-auto my-auto overflow-hidden">
+
+        <div className="bg-gradient-to-r from-blue-600/90 to-indigo-600/90 px-6 py-6 sm:px-8 sm:py-10 text-center">
+          <div className="inline-block px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-white text-[10px] sm:text-xs font-bold tracking-[0.2em] mb-4 uppercase">
+            Future of Real Estate
+          </div>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight mb-4 drop-shadow-lg">
+            SMART TOUR 3D
           </h1>
-          <p className="text-blue-100 mt-1 sm:mt-2 text-sm sm:base">
-            Virtual 3D Tour - Experience Your Dream Home
+          <p className="text-blue-100 text-base sm:text-lg max-w-2xl mx-auto font-medium opacity-90">
+            沉浸式三维房产预览系统：融合 React 18 与物理引擎，提供电影级漫游与程序化视频生成的全新看房体验。
           </p>
         </div>
-        
+
         <div className="p-4 sm:p-6 md:p-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-            
+
             <button
               onClick={() => handleStart('auto-tour')}
               className="group relative overflow-hidden rounded-xl sm:rounded-2xl border-2 border-blue-200 hover:border-blue-500 transition-all duration-300 p-4 sm:p-6 md:p-8 text-left bg-gradient-to-br from-blue-50 to-indigo-50 hover:shadow-xl"
@@ -50,7 +67,7 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
                 Start Tour
               </div>
             </button>
-            
+
             <button
               onClick={() => handleStart('free-explore')}
               className="group relative overflow-hidden rounded-xl sm:rounded-2xl border-2 border-green-200 hover:border-green-500 transition-all duration-300 p-4 sm:p-6 md:p-8 text-left bg-gradient-to-br from-green-50 to-emerald-50 hover:shadow-xl"
@@ -92,9 +109,9 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
                 Start View
               </div>
             </button>
-            
+
           </div>
-          
+
           <div className="bg-gray-50 rounded-xl p-4 sm:p-6">
             <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
               <span>🏠</span>
@@ -127,7 +144,7 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
               </div>
             </div>
           </div>
-          
+
         </div>
       </div>
     </div>
