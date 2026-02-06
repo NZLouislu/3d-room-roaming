@@ -24,6 +24,8 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
           muted
           loop
           playsInline
+          poster="/videos/poster.jpg"
+          preload="auto"
           className="w-full h-full object-cover scale-[1.02] filter brightness-[0.7] contrast-[1.1]"
         >
           <source src="/videos/3D-SmartTour-web-bg.mp4" type="video/mp4" />

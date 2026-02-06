@@ -12,7 +12,8 @@
     "coverage": "vitest run --coverage",
     "video": "remotion preview src/remotion/index.ts",
     "video:render": "remotion render src/remotion/index.ts GuidedTour out/3D-SmartTour-Showcase.mp4",
-    "video:build-web": "remotion render src/remotion/index.ts WebBackground public/videos/3D-SmartTour-web-bg.mp4 --crf=28 --codec=h264"
+    "video:build-web": "remotion render src/remotion/index.ts WebBackground public/videos/3D-SmartTour-web-bg.mp4 --crf=28 --codec=h264 --pixel-format=yuv420p",
+    "video:poster": "remotion still src/remotion/index.ts WebBackground public/videos/poster.jpg --frame=0"
   },
   "dependencies": {
     "@react-three/drei": "^9.105.0",
