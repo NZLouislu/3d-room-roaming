@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 
 interface WelcomeProps {
   onStart: (mode: 'auto-tour' | 'free-explore' | 'bird-view') => void;
@@ -6,42 +6,6 @@ interface WelcomeProps {
 
 export function RealEstateWelcome({ onStart }: WelcomeProps) {
   const [visible, setVisible] = useState(true);
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const attemptPlay = async () => {
-      try {
-        console.log('Attempting to play video...');
-        console.log('Video src:', video.src);
-        console.log('Video readyState:', video.readyState);
-
-        await video.play();
-        console.log('✅ Video playing successfully');
-      } catch (err) {
-        console.error('❌ Video autoplay failed:', err);
-      }
-    };
-
-    if (video.readyState >= 3) {
-      attemptPlay();
-    } else {
-      video.addEventListener('loadeddata', attemptPlay);
-      video.addEventListener('canplay', attemptPlay);
-    }
-
-    video.addEventListener('error', (e) => {
-      console.error('Video error event:', e);
-      console.error('Video error details:', video.error);
-    });
-
-    return () => {
-      video.removeEventListener('loadeddata', attemptPlay);
-      video.removeEventListener('canplay', attemptPlay);
-    };
-  }, []);
 
   if (!visible) return null;
 
@@ -50,32 +14,16 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
     onStart(mode);
   };
 
-  const handleVideoLoad = (e: React.SyntheticEvent<HTMLVideoElement>) => {
-    const video = e.currentTarget;
-    console.log('onLoadedData fired, readyState:', video.readyState);
-    video.play().catch(err => {
-      console.warn('Video autoplay failed in onLoadedData:', err);
-    });
-  };
-
   return (
     <div className="fixed inset-0 bg-black z-[100] font-sans text-white overflow-hidden selection:bg-blue-500/30">
 
-      {/* 1. Immersive Video Background */}
+      {/* 1. Immersive Animated Background */}
       <div className="absolute inset-0 z-0">
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster="/videos/poster.jpg"
-          preload="auto"
-          onLoadedData={handleVideoLoad}
+        <img
+          src="/videos/3D-SmartTour-Showcase.gif"
+          alt="3D Tour Background"
           className="w-full h-full object-cover scale-[1.02] filter brightness-[0.7] contrast-[1.1]"
-        >
-          <source src="/videos/3D-SmartTour-web-bg.mp4" type="video/mp4" />
-        </video>
+        />
         {/* Cinematic Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/60 pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)] pointer-events-none" />
@@ -151,8 +99,6 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
   );
 }
 
-// Sub-components for cleaner code
-
 function ModeCard({ title, icon, desc, features, color, onClick }: any) {
   const colors: any = {
     blue: "hover:border-blue-500/50 hover:bg-blue-900/20 group-hover:text-blue-400",
@@ -218,4 +164,3 @@ function StatItem({ icon, value, label }: any) {
     </div>
   );
 }
-
