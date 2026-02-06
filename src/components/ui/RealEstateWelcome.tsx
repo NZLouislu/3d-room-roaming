@@ -17,10 +17,10 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
   return (
     <div className="fixed inset-0 bg-black z-[100] font-sans text-white overflow-hidden selection:bg-blue-500/30">
 
-      {/* 1. Immersive Animated Background */}
+      {/* 1. Immersive Background */}
       <div className="absolute inset-0 z-0">
         <img
-          src="/videos/3D-SmartTour-Showcase.gif"
+          src="/videos/poster.jpg"
           alt="3D Tour Background"
           className="w-full h-full object-cover scale-[1.02] filter brightness-[0.7] contrast-[1.1]"
         />
