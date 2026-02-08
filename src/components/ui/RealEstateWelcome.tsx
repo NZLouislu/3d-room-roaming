@@ -18,7 +18,7 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
     <div className="fixed inset-0 bg-black z-[100] font-sans text-white overflow-hidden selection:bg-blue-500/30">
 
       {/* 1. Immersive Video Background */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 bg-black">
         <video
           autoPlay
           muted
@@ -27,34 +27,34 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
           disablePictureInPicture
           poster="/videos/poster.jpg"
           preload="metadata"
+          onCanPlay={(e) => e.currentTarget.play()}
           className="w-full h-full object-cover scale-[1.02] filter brightness-[0.7] contrast-[1.1]"
         >
-          <source src="/videos/3D-SmartTour-web-bg.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
+          <source src="/videos/3D-SmartTour-web-bg.mp4" type="video/mp4" />
         </video>
         {/* Cinematic Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/60 pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)] pointer-events-none" />
       </div>
 
-      {/* 2. Main Content Layout */}
-      <div className="relative z-10 h-full flex flex-col justify-between px-6 py-8 md:px-12 md:py-12 max-w-[1920px] mx-auto">
+      {/* 2. Main Content Layout - Using dvh for mobile height consistency */}
+      <div className="relative z-10 min-h-[100dvh] flex flex-col justify-between px-6 py-6 md:px-12 md:py-12 max-w-[1920px] mx-auto overflow-y-auto">
 
         {/* Top Header Section */}
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 animate-fade-in-down">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="h-[2px] w-8 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
-              <span className="text-blue-400 font-bold tracking-[0.2em] text-xs uppercase">Future of Real Estate</span>
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 animate-fade-in-down pt-4 md:pt-0">
+          <div className="flex-1 w-full">
+            <div className="flex items-center gap-3 mb-1">
+              <div className="h-[2px] w-6 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+              <span className="text-blue-400 font-bold tracking-[0.2em] text-[10px] md:text-xs uppercase font-sans">Future of Real Estate</span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none mb-2 drop-shadow-2xl">
+            <h1 className="text-4xl md:text-7xl font-black tracking-tight leading-none mb-2 drop-shadow-2xl">
               SMART TOUR <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">3D</span>
             </h1>
-            <p className="text-gray-300 max-w-xl text-lg font-light leading-relaxed border-l-2 border-white/20 pl-4 mt-4 bg-white/5 backdrop-blur-sm py-2 pr-4 rounded-r-lg">
+            <p className="hidden md:block text-gray-300 max-w-xl text-lg font-light leading-relaxed border-l-2 border-white/20 pl-4 mt-4 bg-white/5 backdrop-blur-sm py-2 pr-4 rounded-r-lg">
               Immersive 3D Real Estate System: Fusing React 18 with physics engines to deliver cinematic tours and programmatic video generation for a revolutionary viewing experience.
             </p>
           </div>
 
-          {/* Stats Bar (Moved to top right for balance) */}
+          {/* Stats Bar (Hidden on mobile to save space) */}
           <div className="hidden lg:flex gap-8 bg-white/5 backdrop-blur-md px-8 py-4 rounded-2xl border border-white/10 shadow-2xl">
             <StatItem icon="🛏️" value="4" label="Bedrooms" />
             <StatItem icon="🚿" value="3" label="Bathrooms" />
@@ -64,27 +64,26 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
         </header>
 
         {/* Middle Spacer - Leaves room for the video to shine */}
-        <div className="flex-grow min-h-[100px]" />
+        <div className="hidden md:block flex-grow" />
 
         {/* Bottom Interaction Section */}
-        <div className="w-full max-w-2xl mx-auto animate-fade-in-up">
-          <h2 className="text-xl md:text-2xl font-semibold mb-6 flex items-center justify-center gap-3 text-white/90">
-            <span className="flex items-center justify-center w-8 h-8 rounded-full border border-white/30 text-sm">▶</span>
+        <div className="w-full max-w-2xl mx-auto animate-fade-in-up mt-4 md:mt-0 pb-12 md:pb-0">
+          <h2 className="text-lg md:text-2xl font-semibold mb-4 md:mb-6 flex items-center justify-center gap-3 text-white/90">
+            <span className="flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-full border border-white/30 text-[10px] md:text-sm">▶</span>
             Experience the Property
           </h2>
 
-          <div className="flex justify-center">
+          <div className="flex justify-center w-full px-4 md:px-0">
             <ModeCard
               title="Start Immersive Tour"
               icon="🎬"
-              desc="Sit back for an automated cinematic tour, or take control anytime to explore freely using WASD keys."
-              features={['Automated Cinematic Path', 'Full Manual Control / WASD', 'High-Resolution 3D Detail']}
+              desc="Cinematic tour with WASD exploration."
+              features={['Automated Path', 'WASD Control']}
               color="blue"
               onClick={() => handleStart('auto-tour')}
             />
           </div>
         </div>
-
       </div>
     </div>
   );
