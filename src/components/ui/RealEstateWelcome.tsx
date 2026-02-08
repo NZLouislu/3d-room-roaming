@@ -24,11 +24,12 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
           muted
           loop
           playsInline
+          disablePictureInPicture
           poster="/videos/poster.jpg"
-          preload="auto"
+          preload="metadata"
           className="w-full h-full object-cover scale-[1.02] filter brightness-[0.7] contrast-[1.1]"
         >
-          <source src="/videos/3D-SmartTour-web-bg.mp4" type="video/mp4" />
+          <source src="/videos/3D-SmartTour-web-bg.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
         </video>
         {/* Cinematic Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/60 pointer-events-none" />
@@ -66,36 +67,20 @@ export function RealEstateWelcome({ onStart }: WelcomeProps) {
         <div className="flex-grow min-h-[100px]" />
 
         {/* Bottom Interaction Section */}
-        <div className="w-full animate-fade-in-up">
-          <h2 className="text-xl md:text-2xl font-semibold mb-6 flex items-center gap-3 text-white/90">
+        <div className="w-full max-w-2xl mx-auto animate-fade-in-up">
+          <h2 className="text-xl md:text-2xl font-semibold mb-6 flex items-center justify-center gap-3 text-white/90">
             <span className="flex items-center justify-center w-8 h-8 rounded-full border border-white/30 text-sm">▶</span>
-            Select Viewing Mode
+            Experience the Property
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="flex justify-center">
             <ModeCard
-              title="Guided Tour"
+              title="Start Immersive Tour"
               icon="🎬"
-              desc="Sit back regarding an automated cinematic tour of highlights."
-              features={['Exterior 360°', 'Key Highlights', 'Cinematic Path']}
+              desc="Sit back for an automated cinematic tour, or take control anytime to explore freely using WASD keys."
+              features={['Automated Cinematic Path', 'Full Manual Control / WASD', 'High-Resolution 3D Detail']}
               color="blue"
               onClick={() => handleStart('auto-tour')}
-            />
-            <ModeCard
-              title="Free Explore"
-              icon="🎮"
-              desc="Navigate freely using WASD keys like a video game."
-              features={['Full Control', 'Walk Everywhere', ' Interactive']}
-              color="green"
-              onClick={() => handleStart('free-explore')}
-            />
-            <ModeCard
-              title="Bird View"
-              icon="🦅"
-              desc="Get a complete overhead perspective of the layout."
-              features={['Top-down View', 'Layout Overview', 'RoomCoords']}
-              color="purple"
-              onClick={() => handleStart('bird-view')}
             />
           </div>
         </div>
@@ -121,7 +106,7 @@ function ModeCard({ title, icon, desc, features, color, onClick }: any) {
   return (
     <button
       onClick={onClick}
-      className={`group relative text-left p-6 rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl transition-all duration-500 hover:translate-y-[-4px] hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] ${colors[color]}`}
+      className={`group relative text-left p-8 rounded-3xl border border-white/20 bg-white/5 backdrop-blur-2xl transition-all duration-500 hover:translate-y-[-4px] hover:shadow-[0_20px_60px_rgba(0,0,0,0.6)] ${colors[color]}`}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
 
