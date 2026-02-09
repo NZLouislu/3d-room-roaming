@@ -30,13 +30,13 @@ export function TourDebugPanel({
 }: TourDebugPanelProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [editMode, setEditMode] = useState(false);
-  
+
   const displayPosition = livePosition || currentPosition;
-  
+
   const [posX, setPosX] = useState(displayPosition[0].toFixed(2));
   const [posY, setPosY] = useState(displayPosition[1].toFixed(2));
   const [posZ, setPosZ] = useState(displayPosition[2].toFixed(2));
-  
+
   const [lookX, setLookX] = useState(currentLookAt[0].toFixed(2));
   const [lookY, setLookY] = useState(currentLookAt[1].toFixed(2));
   const [lookZ, setLookZ] = useState(currentLookAt[2].toFixed(2));
@@ -86,7 +86,7 @@ export function TourDebugPanel({
     return (
       <button
         onClick={() => setIsExpanded(true)}
-        className="fixed top-4 left-4 z-50 bg-purple-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-purple-700 transition"
+        className="fixed top-20 left-4 z-50 bg-purple-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-purple-700 transition"
       >
         🔧 Debug Panel
       </button>
@@ -94,7 +94,7 @@ export function TourDebugPanel({
   }
 
   return (
-    <div className="fixed top-4 left-4 z-50 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-4 w-96 max-h-[90vh] overflow-y-auto">
+    <div className="fixed top-20 left-4 z-50 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-4 w-96 max-h-[90vh] overflow-y-auto">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-bold text-purple-800 flex items-center gap-2">
           🔧 Tour Debug Panel
@@ -128,21 +128,19 @@ export function TourDebugPanel({
         <div className="flex gap-2">
           <button
             onClick={onTogglePause}
-            className={`flex-1 px-3 py-2 rounded-lg text-white text-sm font-medium transition ${
-              isPaused 
-                ? 'bg-green-600 hover:bg-green-700' 
+            className={`flex-1 px-3 py-2 rounded-lg text-white text-sm font-medium transition ${isPaused
+                ? 'bg-green-600 hover:bg-green-700'
                 : 'bg-orange-600 hover:bg-orange-700'
-            }`}
+              }`}
           >
             {isPaused ? '▶️ Resume' : '⏸️ Pause'}
           </button>
           <button
             onClick={() => setEditMode(!editMode)}
-            className={`flex-1 px-3 py-2 rounded-lg text-white text-sm font-medium transition ${
-              editMode 
-                ? 'bg-blue-600 hover:bg-blue-700' 
+            className={`flex-1 px-3 py-2 rounded-lg text-white text-sm font-medium transition ${editMode
+                ? 'bg-blue-600 hover:bg-blue-700'
                 : 'bg-gray-600 hover:bg-gray-700'
-            }`}
+              }`}
           >
             {editMode ? '📝 Editing' : '✏️ Edit Mode'}
           </button>

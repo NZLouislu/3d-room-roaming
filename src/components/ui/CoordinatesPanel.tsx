@@ -16,19 +16,19 @@ export const CoordinatesPanel = ({ position, target, visible }: CoordinatesPanel
       target,
       timestamp: new Date().toISOString()
     };
-    
+
     console.log('=== 📍 3D Coordinate Recorded ===');
     console.log(JSON.stringify(recordData, null, 2));
-    
+
     alert(`Coordinates Recorded!\nPos: [${position.join(', ')}]\nTarget: [${target.join(', ')}]\n(Check Console for JSON)`);
   };
 
   return (
-    <div className="absolute top-20 left-4 bg-black/80 text-white p-4 rounded-xl backdrop-blur-md shadow-2xl z-40 w-80 font-mono transition-all">
+    <div className="absolute top-24 left-4 bg-black/80 text-white p-4 rounded-xl backdrop-blur-md shadow-2xl z-40 w-80 font-mono transition-all">
       <div className="text-xs text-gray-400 mb-2 uppercase tracking-wider font-bold text-center">
         Bird View Coordinates
       </div>
-      
+
       <div className="space-y-3">
         <div className="bg-white/10 p-2 rounded">
           <div className="text-gray-400 text-xs">Camera Position (x, y, z)</div>
@@ -50,9 +50,9 @@ export const CoordinatesPanel = ({ position, target, visible }: CoordinatesPanel
         >
           <span>⏺</span> Record View
         </button>
-        
+
         <div className="text-[10px] text-gray-500 text-center leading-tight">
-          Adjust view with Mouse/Touch.<br/>
+          Adjust view with Mouse/Touch.<br />
           Click record to save for Room Point setup.
         </div>
       </div>

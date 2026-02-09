@@ -19,9 +19,9 @@ interface AutoTourControllerProps {
   onLookAtChange?: (lookAt: [number, number, number]) => void;
 }
 
-export function AutoTourController({ 
-  tourPoints, 
-  enabled, 
+export function AutoTourController({
+  tourPoints,
+  enabled,
   currentIndex,
   setCurrentIndex,
   progress,
@@ -38,7 +38,7 @@ export function AutoTourController({
   const [isMouseDown, setIsMouseDown] = useState(false);
   const rotationRef = useRef({ yaw: 0, pitch: 0 });
   const performanceTier = useStore((state) => state.performanceTier);
-  
+
   const currentPoint = tourPoints[currentIndex];
 
   useEffect(() => {
@@ -125,7 +125,7 @@ export function AutoTourController({
       if (isPaused && currentPoint) {
         camera.position.set(...currentPoint.position);
         camera.lookAt(...currentPoint.lookAt);
-        
+
         const direction = new Vector3(...currentPoint.lookAt).sub(new Vector3(...currentPoint.position)).normalize();
         rotationRef.current.yaw = Math.atan2(direction.x, direction.z);
         rotationRef.current.pitch = Math.asin(direction.y);
@@ -140,10 +140,10 @@ export function AutoTourController({
 
   // Apply custom position immediately if provided (e.g. from debug panel Apply)
   useEffect(() => {
-      if (customPosition) {
-        camera.position.set(...customPosition);
-        if (customLookAt) camera.lookAt(...customLookAt);
-      }
+    if (customPosition) {
+      camera.position.set(...customPosition);
+      if (customLookAt) camera.lookAt(...customLookAt);
+    }
   }, [customPosition, customLookAt, camera]);
 
   useFrame((_state, delta) => {
@@ -151,16 +151,16 @@ export function AutoTourController({
 
     if (isPaused) {
       const keys = keysRef.current;
-      const baseSpeed = performanceTier === 'low' ? 2.0 : 3.0; 
+      const baseSpeed = performanceTier === 'low' ? 2.0 : 3.0;
       const moveSpeed = keys.has('shift') ? baseSpeed * 4.0 : baseSpeed;
-      
+
       camera.rotation.order = 'YXZ';
       camera.rotation.y = rotationRef.current.yaw;
       camera.rotation.x = rotationRef.current.pitch;
 
       const forward = new Vector3(0, 0, -1);
       const right = new Vector3(1, 0, 0);
-      
+
       forward.applyEuler(new Euler(0, rotationRef.current.yaw, 0, 'YXZ'));
       right.applyEuler(new Euler(0, rotationRef.current.yaw, 0, 'YXZ'));
 
@@ -187,30 +187,30 @@ export function AutoTourController({
         }
 
         if (onLookAtChange) {
-           const direction = new Vector3(0, 0, -1);
-           direction.applyEuler(new Euler(
-             rotationRef.current.pitch, 
-             rotationRef.current.yaw, 
-             0, 
-             'YXZ'
-           ));
-           const target = camera.position.clone().add(direction.multiplyScalar(10));
-           onLookAtChange([target.x, target.y, target.z]);
+          const direction = new Vector3(0, 0, -1);
+          direction.applyEuler(new Euler(
+            rotationRef.current.pitch,
+            rotationRef.current.yaw,
+            0,
+            'YXZ'
+          ));
+          const target = camera.position.clone().add(direction.multiplyScalar(10));
+          onLookAtChange([target.x, target.y, target.z]);
         }
       }
       return;
     }
-    
-    const targetPos = customPosition 
+
+    const targetPos = customPosition
       ? new Vector3(...customPosition)
       : new Vector3(...currentPoint.position);
-    const targetLookAt = customLookAt 
+    const targetLookAt = customLookAt
       ? new Vector3(...customLookAt)
       : new Vector3(...currentPoint.lookAt);
-    
+
     camera.position.lerp(targetPos, delta * 2.5);
     camera.lookAt(targetLookAt);
-    
+
     if (Math.floor(progress) !== Math.floor(progress + delta)) {
       const dist = camera.position.distanceTo(targetPos);
       console.log(`[AutoTour Debug] View #${currentPoint.id}: ${currentPoint.title}`);
@@ -219,7 +219,7 @@ export function AutoTourController({
       console.log(`  - LookAt: [${targetLookAt.x.toFixed(2)}, ${targetLookAt.y.toFixed(2)}, ${targetLookAt.z.toFixed(2)}]`);
       console.log(`  - Distance to Target: ${dist.toFixed(2)}`);
     }
-    
+
     setProgress(prev => {
       const newProgress = prev + delta;
       if (newProgress >= currentPoint.duration) {
@@ -227,20 +227,20 @@ export function AutoTourController({
           setCurrentIndex(i => i + 1);
           return 0;
         } else {
-             // Last point finished - Pause and show End UI
-             if (!isPaused) {
-                 // We don't have setIsPaused here, but we pass isPaused prop.
-                 // We need to trigger a state change potentially.
-                 // But this component doesn't control isPaused state directly, parent does.
-                 // We can't call setIsPaused here? 
-                 // Actually TourUI has setIsPaused. AutoTourController props has isPaused but not setter.
-                 // Wait, AutoTourController *does not* receive setIsPaused.
-                 // It receives onComplete.
-                 // Let's call onComplete with a special flag? Or just use a callback?
-                 // Or we can just let it sit at the end.
-                 return currentPoint.duration;
-             }
-             return prev;
+          // Last point finished - Pause and show End UI
+          if (!isPaused) {
+            // We don't have setIsPaused here, but we pass isPaused prop.
+            // We need to trigger a state change potentially.
+            // But this component doesn't control isPaused state directly, parent does.
+            // We can't call setIsPaused here? 
+            // Actually TourUI has setIsPaused. AutoTourController props has isPaused but not setter.
+            // Wait, AutoTourController *does not* receive setIsPaused.
+            // It receives onComplete.
+            // Let's call onComplete with a special flag? Or just use a callback?
+            // Or we can just let it sit at the end.
+            return currentPoint.duration;
+          }
+          return prev;
         }
       }
       return newProgress;
@@ -261,19 +261,19 @@ interface TourUIProps {
   onComplete: () => void;
 }
 
-export function TourUI({ 
-  tourPoints, 
-  currentIndex, 
-  setCurrentIndex, 
-  progress, 
+export function TourUI({
+  tourPoints,
+  currentIndex,
+  setCurrentIndex,
+  progress,
   setProgress,
-  isPaused, 
-  setIsPaused, 
-  onComplete 
+  isPaused,
+  setIsPaused,
+  onComplete
 }: TourUIProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const currentPoint = tourPoints[currentIndex];
-  
+
   // Check if tour is finished
   const isFinished = currentIndex === tourPoints.length - 1 && progress >= currentPoint.duration;
 
@@ -283,9 +283,9 @@ export function TourUI({
         <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl transform transition-all scale-100">
           <h2 className="text-3xl font-black text-gray-900 mb-2">Tour Complete!</h2>
           <p className="text-gray-600 mb-8">You've seen all the highlights. What would you like to do next?</p>
-          
+
           <div className="flex flex-col gap-3">
-             <button
+            <button
               onClick={() => {
                 setCurrentIndex(() => 0);
                 setProgress(0);
@@ -308,9 +308,9 @@ export function TourUI({
   }
 
   return (
-    <div className="fixed top-16 left-4 z-40 pointer-events-auto">
+    <div className="fixed top-24 left-6 z-40 pointer-events-auto">
       {!isExpanded ? (
-        <div 
+        <div
           className="group relative cursor-pointer"
           onClick={() => setIsExpanded(true)}
         >
@@ -333,7 +333,7 @@ export function TourUI({
                 {currentPoint.description}
               </p>
             </div>
-            <button 
+            <button
               onClick={(e) => {
                 e.stopPropagation();
                 setIsExpanded(false);
@@ -352,36 +352,35 @@ export function TourUI({
               View {currentIndex + 1} of {tourPoints.length}
             </span>
           </div>
-          
+
           <div className="w-full bg-gray-100 rounded-full h-1.5 mb-6 overflow-hidden">
-            <div 
+            <div
               className="bg-blue-600 h-full rounded-full transition-all duration-100 ease-linear"
               style={{ width: `${(progress / currentPoint.duration) * 100}%` }}
             />
           </div>
-          
+
           <div className="space-y-3">
             <button
               onClick={() => setIsPaused(!isPaused)}
-              className={`w-full px-4 py-3 text-white text-sm font-bold rounded-xl transition shadow-sm flex items-center justify-center gap-2 ${
-                isPaused 
-                  ? 'bg-blue-600 hover:bg-blue-700 active:scale-[0.98]' 
+              className={`w-full px-4 py-3 text-white text-sm font-bold rounded-xl transition shadow-sm flex items-center justify-center gap-2 ${isPaused
+                  ? 'bg-blue-600 hover:bg-blue-700 active:scale-[0.98]'
                   : 'bg-orange-500 hover:bg-orange-600 active:scale-[0.98]'
-              }`}
+                }`}
             >
               {isPaused ? (
                 <>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
                   Resume Tour
                 </>
               ) : (
                 <>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" /></svg>
                   Pause Tour
                 </>
               )}
             </button>
-            
+
             <div className="grid grid-cols-3 gap-2">
               <button
                 onClick={() => {
@@ -395,7 +394,7 @@ export function TourUI({
               >
                 Previous
               </button>
-              
+
               <button
                 onClick={() => {
                   if (currentIndex < tourPoints.length - 1) {
@@ -408,7 +407,7 @@ export function TourUI({
               >
                 Next
               </button>
-              
+
               <button
                 onClick={onComplete}
                 className="flex flex-col items-center justify-center gap-1 px-2 py-2 bg-white border border-red-100 text-red-600 text-xs font-semibold rounded-lg hover:bg-red-50 hover:border-red-200 transition"

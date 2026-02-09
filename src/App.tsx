@@ -18,6 +18,7 @@ import { PerformanceMonitor } from './components/3d/PerformanceMonitor';
 import { PerformanceHUD } from './components/ui/PerformanceHUD';
 import { detectRendererCapabilities } from './utils/rendererDetection';
 import { useStore } from './hooks/useStore';
+import NASAHeader from './Navbar';
 
 type AppMode = 'welcome' | 'auto-tour' | 'free-explore' | 'bird-view';
 
@@ -30,14 +31,14 @@ function CameraPositionLogger() {
         console.log('=== Current Camera Position ===');
         console.log(`Position: [${camera.position.x.toFixed(2)}, ${camera.position.y.toFixed(2)}, ${camera.position.z.toFixed(2)}]`);
         console.log(`Rotation: [${camera.rotation.x.toFixed(2)}, ${camera.rotation.y.toFixed(2)}, ${camera.rotation.z.toFixed(2)}]`);
-        
+
         const direction = new THREE.Vector3();
         camera.getWorldDirection(direction);
         const lookAt = camera.position.clone().add(direction.multiplyScalar(10));
         console.log(`LookAt (estimated): [${lookAt.x.toFixed(2)}, ${lookAt.y.toFixed(2)}, ${lookAt.z.toFixed(2)}]`);
       }
     };
-    
+
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [camera]);
@@ -49,7 +50,7 @@ function AppImproved() {
   const [viewMode, setViewMode] = useState<'first-person' | 'third-person'>('third-person');
   const [mode, setMode] = useState<AppMode>('welcome');
   const [tourEnabled, setTourEnabled] = useState(false);
-  
+
   const [tourIndex, setTourIndex] = useState(0);
   const [tourProgress, setTourProgress] = useState(0);
   const [tourPaused, setTourPaused] = useState(false);
@@ -59,10 +60,10 @@ function AppImproved() {
   const [customLookAt, setCustomLookAt] = useState<[number, number, number] | undefined>();
 
   const [currentCameraPos, setCurrentCameraPos] = useState<[number, number, number]>([0, 28, -40]);
-  
-  const [birdViewCoords, setBirdViewCoords] = useState<{pos: [number, number, number], target: [number, number, number]}>({ 
-    pos: [0, 50, 0], 
-    target: [0, 0, 0] 
+
+  const [birdViewCoords, setBirdViewCoords] = useState<{ pos: [number, number, number], target: [number, number, number] }>({
+    pos: [0, 50, 0],
+    target: [0, 0, 0]
   });
 
   const [rendererReady, setRendererReady] = useState(false);
@@ -101,9 +102,14 @@ function AppImproved() {
       setTourIndex(0);
       setTourProgress(0);
       setTourPaused(false);
-      setTourPaused(false);
       setDebugMode(false);
     }
+  };
+
+  const handleGoHome = () => {
+    setMode('welcome');
+    setTourEnabled(false);
+    setDebugMode(false);
   };
 
   const handleTourComplete = () => {
@@ -142,10 +148,18 @@ function AppImproved() {
 
   return (
     <>
-      <Navbar isBirdView={mode === 'bird-view'} onToggleBirdView={handleToggleBirdView} />
-      
+      {/* Global NASA Style Header */}
+      <NASAHeader
+        onStart={(m) => handleWelcomeChoice(m)}
+        onGoHome={handleGoHome}
+      />
+
+      {mode !== 'welcome' && (
+        <Navbar isBirdView={mode === 'bird-view'} onToggleBirdView={handleToggleBirdView} />
+      )}
+
       {mode === 'bird-view' && (
-        <CoordinatesPanel 
+        <CoordinatesPanel
           visible={true}
           position={birdViewCoords.pos}
           target={birdViewCoords.target}
@@ -154,17 +168,17 @@ function AppImproved() {
 
       {mode === 'welcome' && (
         <div className="fixed inset-0 z-[100]">
-          <RealEstateWelcome onStart={handleWelcomeChoice} />
+          <RealEstateWelcome onStart={handleWelcomeChoice} onGoHome={handleGoHome} />
         </div>
       )}
 
       {rendererReady && (
-        <Canvas 
+        <Canvas
           shadows={performanceTier === 'high'}
           dpr={isMobile ? 1.0 : (performanceTier === 'low' ? 0.5 : (performanceTier === 'medium' ? [0.75, 1] : [1, 1.5]))}
-          camera={{ 
-            fov: 45, 
-            position: mode === 'auto-tour' ? [0, 28, -40] : [0, 12, 30] 
+          camera={{
+            fov: 45,
+            position: mode === 'auto-tour' ? [0, 28, -40] : [0, 12, 30]
           }}
           gl={{
             antialias: !isMobile && performanceTier === 'high',
@@ -189,49 +203,49 @@ function AppImproved() {
               gl.toneMapping = THREE.ACESFilmicToneMapping;
               gl.toneMappingExposure = 1;
             } else {
-               gl.shadowMap.autoUpdate = false;
-               gl.shadowMap.needsUpdate = false;
-               gl.toneMapping = THREE.NoToneMapping;
+              gl.shadowMap.autoUpdate = false;
+              gl.shadowMap.needsUpdate = false;
+              gl.toneMapping = THREE.NoToneMapping;
             }
           }}
           onError={(error) => {
             console.error('[Canvas] Error during initialization:', error);
           }}
         >
-        {/* Sky and Lights are handled in ExperienceImproved */}
-        <Physics debug={false} timeStep={1/30}>
-          <ExperienceImproved 
-            viewMode={viewMode} 
-            enablePlayer={mode !== 'auto-tour' && mode !== 'bird-view'} 
-          />
-        </Physics>
-        
-        <BirdViewControls 
-          isActive={mode === 'bird-view'}
-          onUpdate={handleBirdViewUpdate}
-        />
-        
-        <PerformanceMonitor />
+          {/* Sky and Lights are handled in ExperienceImproved */}
+          <Physics debug={false} timeStep={1 / 30}>
+            <ExperienceImproved
+              viewMode={viewMode}
+              enablePlayer={mode !== 'auto-tour' && mode !== 'bird-view'}
+            />
+          </Physics>
 
-        {tourEnabled && (
-          <AutoTourController
-            tourPoints={DOUBLE_FLOOR_HOUSE_TOUR}
-            enabled={tourEnabled}
-            currentIndex={tourIndex}
-            setCurrentIndex={setTourIndex}
-            progress={tourProgress}
-            setProgress={setTourProgress}
-            isPaused={tourPaused}
-            onComplete={handleTourComplete}
-            customPosition={customPosition}
-            customLookAt={customLookAt}
-            onPositionChange={setCurrentCameraPos}
-            onLookAtChange={setCustomLookAt}
+          <BirdViewControls
+            isActive={mode === 'bird-view'}
+            onUpdate={handleBirdViewUpdate}
           />
-        )}
-        
-        {mode === 'free-explore' && <ViewpointSelector />}
-        <CameraPositionLogger />
+
+          <PerformanceMonitor />
+
+          {tourEnabled && (
+            <AutoTourController
+              tourPoints={DOUBLE_FLOOR_HOUSE_TOUR}
+              enabled={tourEnabled}
+              currentIndex={tourIndex}
+              setCurrentIndex={setTourIndex}
+              progress={tourProgress}
+              setProgress={setTourProgress}
+              isPaused={tourPaused}
+              onComplete={handleTourComplete}
+              customPosition={customPosition}
+              customLookAt={customLookAt}
+              onPositionChange={setCurrentCameraPos}
+              onLookAtChange={setCustomLookAt}
+            />
+          )}
+
+          {mode === 'free-explore' && <ViewpointSelector />}
+          <CameraPositionLogger />
         </Canvas>
       )}
 
@@ -255,12 +269,12 @@ function AppImproved() {
 
       {tourEnabled && (
         <div className="fixed top-4 left-4 z-50 flex gap-2">
-            <button
-               onClick={() => setDebugMode(!debugMode)}
-               className="px-4 py-2 bg-purple-600 text-white text-sm font-bold rounded-full shadow-lg hover:bg-purple-700 transition"
-            >
-              {debugMode ? '🔧 Hide Debug' : '🔧 Debug Panel'}
-            </button>
+          <button
+            onClick={() => setDebugMode(!debugMode)}
+            className="px-4 py-2 bg-purple-600 text-white text-sm font-bold rounded-full shadow-lg hover:bg-purple-700 transition"
+          >
+            {debugMode ? '🔧 Hide Debug' : '🔧 Debug Panel'}
+          </button>
         </div>
       )}
 
@@ -276,7 +290,7 @@ function AppImproved() {
           onComplete={handleTourComplete}
         />
       )}
-      
+
       {mode === 'free-explore' && (
         <>
           <PropertyInfoOverlay />
