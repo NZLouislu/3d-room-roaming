@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { PROPERTY_LIST } from "./data/properties";
+import { useStore } from "./hooks/useStore";
 
 interface HeaderProps {
   onStart?: (mode: 'auto-tour' | 'free-explore' | 'bird-view') => void;
@@ -7,6 +9,7 @@ interface HeaderProps {
 
 export default function Header({ onStart, onGoHome }: HeaderProps) {
   const [open, setOpen] = useState(false);
+  const { currentPropertyId, setCurrentPropertyId } = useStore();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-[110] bg-black/30 hover:bg-black/60 transition-colors backdrop-blur-sm border-b border-white/5 px-6 py-3">
@@ -22,13 +25,22 @@ export default function Header({ onStart, onGoHome }: HeaderProps) {
           </button>
 
           {/* Nav Links - Desktop */}
-          <nav className="hidden lg:flex items-center gap-6">
-            <button
-              onClick={onGoHome}
-              className="text-sm font-bold tracking-widest transition-colors text-white hover:text-blue-400"
-            >
-              HOME
-            </button>
+          <nav className="hidden lg:flex items-center gap-4">
+            {PROPERTY_LIST.map((property) => (
+              <button
+                key={property.id}
+                onClick={() => {
+                  setCurrentPropertyId(property.id);
+                  onStart?.('bird-view');
+                }}
+                className={`text-[10px] font-black tracking-widest transition-all px-3 py-1 rounded-full ${currentPropertyId === property.id
+                  ? 'bg-white/20 text-white border border-white/40'
+                  : 'text-white/50 hover:text-white'
+                  }`}
+              >
+                {property.name.toUpperCase()}
+              </button>
+            ))}
           </nav>
         </div>
 

@@ -2,7 +2,7 @@ import { Ground } from './Ground';
 import { Lighting } from './Lighting';
 import { Environment } from './Environment';
 import { PlayerImproved } from './PlayerImproved';
-import { DoubleFloorHouseWithSuspense } from './models/DoubleFloorHouse';
+import { PropertyModelManager } from './models/PropertyModelManager';
 
 interface ExperienceImprovedProps {
   viewMode?: 'first-person' | 'third-person';
@@ -14,8 +14,8 @@ export const ExperienceImproved = ({ viewMode = 'third-person', enablePlayer = t
     <>
       <Lighting />
       <Environment />
-      <Ground position={[0, 0, 0]} scale={[100, 1, 100]} />
-      <DoubleFloorHouseWithSuspense />
+      <Ground position={[0, 0, 0]} scale={[500, 1, 500]} />
+      <PropertyModelManager />
       {enablePlayer && <PlayerImproved viewMode={viewMode} />}
     </>
   );

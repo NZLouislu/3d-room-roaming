@@ -1,6 +1,6 @@
 import { Canvas, useThree } from '@react-three/fiber';
 import { Physics } from '@react-three/rapier';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { ExperienceImproved } from './components/3d/ExperienceImproved';
 import { Interface } from './components/ui/Interface';
@@ -10,7 +10,7 @@ import { AutoTourController, TourUI } from './components/3d/AutoTourController';
 import { ViewpointSelector } from './components/ui/ViewpointSelector';
 import { PropertyInfoOverlay } from './components/ui/PropertyInfoOverlay';
 import { TourDebugPanel } from './components/ui/TourDebugPanel';
-import { DOUBLE_FLOOR_HOUSE_TOUR } from './data/tourPoints';
+import { PROPERTY_LIST } from './data/properties';
 import { Navbar } from './components/ui/Navbar';
 import { CoordinatesPanel } from './components/ui/CoordinatesPanel';
 import { BirdViewControls } from './components/3d/BirdViewControls';
@@ -21,6 +21,43 @@ import { useStore } from './hooks/useStore';
 import NASAHeader from './Navbar';
 
 type AppMode = 'welcome' | 'auto-tour' | 'free-explore' | 'bird-view';
+
+function PropertyViewManager() {
+  const { camera } = useThree();
+  const currentPropertyId = useStore((state) => state.currentPropertyId);
+  const currentProperty = PROPERTY_LIST.find(p => p.id === currentPropertyId) || PROPERTY_LIST[0];
+
+  useEffect(() => {
+    const pos = currentProperty.initialPosition;
+    const lookAt = currentProperty.initialLookAt;
+
+    camera.position.set(pos[0], pos[1] + 2, pos[2] + 5);
+    camera.lookAt(new THREE.Vector3(...lookAt));
+    console.log(`[PropertyViewManager] Reset view for: ${currentPropertyId}`);
+  }, [currentPropertyId, camera, currentProperty]);
+
+  return null;
+}
+
+function CameraSystem({ mode }: { mode: AppMode }) {
+  const { camera } = useThree();
+  const initialized = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (initialized.current === mode) return;
+
+    if (mode === 'auto-tour') {
+      camera.position.set(0, 28, -40);
+      camera.lookAt(0, 0, 0);
+    } else if (mode === 'welcome' || mode === 'free-explore') {
+      camera.position.set(0, 12, 30);
+      camera.lookAt(0, 0, 0);
+    }
+    initialized.current = mode;
+  }, [mode, camera]);
+
+  return null;
+}
 
 function CameraPositionLogger() {
   const { camera } = useThree();
@@ -61,13 +98,10 @@ function AppImproved() {
 
   const [currentCameraPos, setCurrentCameraPos] = useState<[number, number, number]>([0, 28, -40]);
 
-  const [birdViewCoords, setBirdViewCoords] = useState<{ pos: [number, number, number], target: [number, number, number] }>({
-    pos: [0, 50, 0],
-    target: [0, 0, 0]
-  });
-
   const [rendererReady, setRendererReady] = useState(false);
-  const { setRendererType, performanceTier, setPerformanceTier, setIsMobile, isMobile } = useStore();
+  const { currentPropertyId, setRendererType, performanceTier, setPerformanceTier, setIsMobile, isMobile } = useStore();
+  const currentProperty = PROPERTY_LIST.find(p => p.id === currentPropertyId) || PROPERTY_LIST[0];
+  const currentTourPoints = currentProperty.tourPoints;
 
   useEffect(() => {
     detectRendererCapabilities().then((capabilities) => {
@@ -76,9 +110,6 @@ function AppImproved() {
       setIsMobile(capabilities.isMobile);
       setRendererReady(true);
       console.log(`Renderer initialized: ${capabilities.type} (${capabilities.performanceTier} tier, mobile: ${capabilities.isMobile})`);
-      if (capabilities.features) {
-        console.log('WebGPU features:', capabilities.features);
-      }
     });
   }, [setRendererType, setPerformanceTier, setIsMobile]);
 
@@ -89,10 +120,6 @@ function AppImproved() {
       setMode('bird-view');
       setTourEnabled(false);
     }
-  };
-
-  const handleBirdViewUpdate = (pos: [number, number, number], target: [number, number, number]) => {
-    setBirdViewCoords({ pos, target });
   };
 
   const handleWelcomeChoice = (choice: 'auto-tour' | 'free-explore' | 'bird-view') => {
@@ -132,16 +159,16 @@ function AppImproved() {
 
   const getCurrentPosition = (): [number, number, number] => {
     if (customPosition) return customPosition;
-    if (tourEnabled && DOUBLE_FLOOR_HOUSE_TOUR[tourIndex]) {
-      return DOUBLE_FLOOR_HOUSE_TOUR[tourIndex].position;
+    if (tourEnabled && currentTourPoints[tourIndex]) {
+      return currentTourPoints[tourIndex].position;
     }
     return currentCameraPos;
   };
 
   const getCurrentLookAt = (): [number, number, number] => {
     if (customLookAt) return customLookAt;
-    if (tourEnabled && DOUBLE_FLOOR_HOUSE_TOUR[tourIndex]) {
-      return DOUBLE_FLOOR_HOUSE_TOUR[tourIndex].lookAt;
+    if (tourEnabled && currentTourPoints[tourIndex]) {
+      return currentTourPoints[tourIndex].lookAt;
     }
     return [0, 0, 0];
   };
@@ -161,8 +188,6 @@ function AppImproved() {
       {mode === 'bird-view' && (
         <CoordinatesPanel
           visible={true}
-          position={birdViewCoords.pos}
-          target={birdViewCoords.target}
         />
       )}
 
@@ -178,7 +203,8 @@ function AppImproved() {
           dpr={isMobile ? 1.0 : (performanceTier === 'low' ? 0.5 : (performanceTier === 'medium' ? [0.75, 1] : [1, 1.5]))}
           camera={{
             fov: 45,
-            position: mode === 'auto-tour' ? [0, 28, -40] : [0, 12, 30]
+            near: 0.1,
+            far: 2000,
           }}
           gl={{
             antialias: !isMobile && performanceTier === 'high',
@@ -186,6 +212,7 @@ function AppImproved() {
             alpha: false,
             stencil: false,
             depth: true,
+            logarithmicDepthBuffer: true,
             preserveDrawingBuffer: false,
             failIfMajorPerformanceCaveat: false,
           }}
@@ -212,6 +239,7 @@ function AppImproved() {
             console.error('[Canvas] Error during initialization:', error);
           }}
         >
+          <CameraSystem mode={mode} />
           {/* Sky and Lights are handled in ExperienceImproved */}
           <Physics debug={false} timeStep={1 / 30}>
             <ExperienceImproved
@@ -220,16 +248,16 @@ function AppImproved() {
             />
           </Physics>
 
+          <PropertyViewManager />
           <BirdViewControls
             isActive={mode === 'bird-view'}
-            onUpdate={handleBirdViewUpdate}
           />
 
           <PerformanceMonitor />
 
           {tourEnabled && (
             <AutoTourController
-              tourPoints={DOUBLE_FLOOR_HOUSE_TOUR}
+              tourPoints={currentTourPoints}
               enabled={tourEnabled}
               currentIndex={tourIndex}
               setCurrentIndex={setTourIndex}
@@ -253,7 +281,7 @@ function AppImproved() {
 
       {debugMode && tourEnabled && (
         <TourDebugPanel
-          tourPoints={DOUBLE_FLOOR_HOUSE_TOUR}
+          tourPoints={currentTourPoints}
           currentIndex={tourIndex}
           onSelectView={handleSelectView}
           isPaused={tourPaused}
@@ -280,7 +308,7 @@ function AppImproved() {
 
       {tourEnabled && !debugMode && (
         <TourUI
-          tourPoints={DOUBLE_FLOOR_HOUSE_TOUR}
+          tourPoints={currentTourPoints}
           currentIndex={tourIndex}
           setCurrentIndex={setTourIndex}
           progress={tourProgress}

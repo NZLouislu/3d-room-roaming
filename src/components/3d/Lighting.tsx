@@ -15,16 +15,17 @@ export const Lighting = () => {
       {!isNight && (
         <>
           <directionalLight
-            position={[30, 40, 20]}
+            position={[40, 60, 30]}
             intensity={isLow ? 0.8 : 1.8}
             castShadow={!isLow}
-            shadow-mapSize={isLow ? [512, 512] : [2048, 2048]}
-            shadow-camera-far={100}
-            shadow-camera-left={-30}
-            shadow-camera-right={30}
-            shadow-camera-top={30}
-            shadow-camera-bottom={-30}
-            shadow-bias={-0.0001}
+            shadow-mapSize={isLow ? [512, 512] : [4096, 4096]}
+            shadow-camera-far={200}
+            shadow-camera-left={-60}
+            shadow-camera-right={60}
+            shadow-camera-top={60}
+            shadow-camera-bottom={-60}
+            shadow-bias={-0.0005}
+            shadow-normalBias={0.02}
           />
           {!isLow && (
             <directionalLight

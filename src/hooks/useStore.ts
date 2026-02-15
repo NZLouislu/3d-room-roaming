@@ -14,6 +14,12 @@ interface State {
   setIsMobile: (isMobile: boolean) => void;
   fps: number;
   setFps: (fps: number) => void;
+  currentPropertyId: string;
+  setCurrentPropertyId: (id: string) => void;
+  birdViewCoords: { pos: [number, number, number], target: [number, number, number] };
+  setBirdViewCoords: (coords: { pos: [number, number, number], target: [number, number, number] }) => void;
+  panMode: boolean;
+  setPanMode: (mode: boolean) => void;
 }
 
 export const useStore = create<State>((set) => ({
@@ -29,4 +35,10 @@ export const useStore = create<State>((set) => ({
   setIsMobile: (isMobile) => set({ isMobile }),
   fps: 60,
   setFps: (fps) => set({ fps }),
+  currentPropertyId: 'demo-house',
+  setCurrentPropertyId: (id) => set({ currentPropertyId: id }),
+  birdViewCoords: { pos: [0, 50, 0], target: [0, 0, 0] },
+  setBirdViewCoords: (coords) => set({ birdViewCoords: coords }),
+  panMode: false,
+  setPanMode: (mode) => set({ panMode: mode }),
 }));

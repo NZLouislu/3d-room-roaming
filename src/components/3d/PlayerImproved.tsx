@@ -4,6 +4,9 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { RigidBody, CapsuleCollider, RapierRigidBody } from '@react-three/rapier';
 import { useKeyboard } from '../../hooks/useKeyboard';
 
+import { PROPERTY_LIST } from '../../data/properties';
+import { useStore } from '../../hooks/useStore';
+
 const WALK_SPEED = 3;
 const RUN_SPEED = 6;
 const MOUSE_SENSITIVITY = 0.002;
@@ -19,13 +22,25 @@ interface PlayerImprovedProps {
 }
 
 export const PlayerImproved = ({ viewMode = 'third-person' }: PlayerImprovedProps) => {
+  const currentPropertyId = useStore((state) => state.currentPropertyId);
+  const currentProperty = PROPERTY_LIST.find(p => p.id === currentPropertyId) || PROPERTY_LIST[0];
+
   const rigidBodyRef = useRef<RapierRigidBody>(null);
   const { camera, gl } = useThree();
   const { forward, backward, left, right } = useKeyboard();
-  
+
   const yaw = useRef(Math.PI);
   const pitch = useRef(0);
   const isRunning = useRef(false);
+
+  useEffect(() => {
+    if (rigidBodyRef.current) {
+      const pos = currentProperty.initialPosition;
+      rigidBodyRef.current.setTranslation({ x: pos[0], y: pos[1], z: pos[2] }, true);
+      rigidBodyRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
+      yaw.current = Math.PI;
+    }
+  }, [currentPropertyId, currentProperty.initialPosition]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -77,7 +92,7 @@ export const PlayerImproved = ({ viewMode = 'third-person' }: PlayerImprovedProp
     const speed = isRunning.current ? RUN_SPEED : WALK_SPEED;
     frontVector.set(0, 0, Number(backward) - Number(forward));
     sideVector.set(Number(left) - Number(right), 0, 0);
-    
+
     direction
       .subVectors(frontVector, sideVector)
       .normalize()
@@ -118,7 +133,7 @@ export const PlayerImproved = ({ viewMode = 'third-person' }: PlayerImprovedProp
       colliders={false}
       mass={1}
       type="dynamic"
-      position={[0, 0.5, 25]}
+      position={currentProperty.initialPosition}
       enabledRotations={[false, false, false]}
       lockRotations
     >

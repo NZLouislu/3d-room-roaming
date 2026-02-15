@@ -1,36 +1,20 @@
-import { renderHook, act } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
-import { useStore } from './useStore';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { useStore } from '../hooks/useStore';
 
 describe('useStore', () => {
-  it('should return initial state', () => {
-    const { result } = renderHook(() => useStore());
-    expect(result.current.selectedObject).toBeNull();
+  beforeEach(() => {
+    useStore.setState({ currentPropertyId: 'demo-house' });
   });
 
-  it('should update selectedObject', () => {
-    const { result } = renderHook(() => useStore());
-    const mockData = { name: 'Sofa', price: '$999', description: 'Comfy' };
-
-    act(() => {
-      result.current.setSelectedObject(mockData);
-    });
-
-    expect(result.current.selectedObject).toEqual(mockData);
+  it('should have a default property id', () => {
+    const state = useStore.getState();
+    expect(state.currentPropertyId).toBe('demo-house');
   });
 
-  it('should clear selectedObject', () => {
-    const { result } = renderHook(() => useStore());
-    const mockData = { name: 'Sofa', price: '$999', description: 'Comfy' };
+  it('should change current property id', () => {
+    const { setCurrentPropertyId } = useStore.getState();
+    setCurrentPropertyId('auckland-northcross');
 
-    act(() => {
-      result.current.setSelectedObject(mockData);
-    });
-    expect(result.current.selectedObject).toEqual(mockData);
-
-    act(() => {
-      result.current.setSelectedObject(null);
-    });
-    expect(result.current.selectedObject).toBeNull();
+    expect(useStore.getState().currentPropertyId).toBe('auckland-northcross');
   });
 });

@@ -1,5 +1,7 @@
 import Header from '../../Navbar';
 import Footer from '../../Footer';
+import { useStore } from '../../hooks/useStore';
+import { PROPERTY_LIST } from '../../data/properties';
 
 interface WelcomeProps {
   onStart: (mode: 'auto-tour' | 'free-explore' | 'bird-view') => void;
@@ -7,6 +9,9 @@ interface WelcomeProps {
 }
 
 export function RealEstateWelcome({ onStart, onGoHome }: WelcomeProps) {
+  const currentPropertyId = useStore((state) => state.currentPropertyId);
+  const currentProperty = PROPERTY_LIST.find(p => p.id === currentPropertyId) || PROPERTY_LIST[0];
+
   return (
     <div className="fixed inset-0 bg-black z-[100] font-sans text-white overflow-y-auto overflow-x-hidden selection:bg-blue-500/30 scroll-smooth">
       <Header onStart={onStart} onGoHome={onGoHome} />
@@ -33,9 +38,13 @@ export function RealEstateWelcome({ onStart, onGoHome }: WelcomeProps) {
 
         {/* Space for Video (Kept clean as requested) */}
         <div className="relative z-10 w-full h-full flex items-end p-12">
-          {/* You could add a tiny 'Live' or 'Active' badge here for detail */}
-          <div className="flex items-center gap-2 px-3 py-1 bg-red-600/80 backdrop-blur-sm rounded-sm text-[8px] font-black uppercase tracking-widest animate-pulse">
-            3D Rendering Active
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2 px-3 py-1 bg-blue-600/80 backdrop-blur-sm rounded-sm text-[8px] font-black uppercase tracking-widest">
+              Selected: {currentProperty.name}
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1 bg-red-600/80 backdrop-blur-sm rounded-sm text-[8px] font-black uppercase tracking-widest animate-pulse">
+              3D Rendering Active
+            </div>
           </div>
         </div>
       </section>
@@ -45,9 +54,14 @@ export function RealEstateWelcome({ onStart, onGoHome }: WelcomeProps) {
         <div className="max-w-7xl mx-auto">
           {/* NASA Style Divider Label */}
           <div className="flex items-center gap-4 py-8 mb-4">
-            <span className="text-[9px] tracking-[0.5em] uppercase font-black text-white/40 whitespace-nowrap">
-              Explore Core Capabilities to Start Exploring
-            </span>
+            <div className="flex flex-col">
+              <span className="text-[9px] tracking-[0.5em] uppercase font-black text-white/40 whitespace-nowrap">
+                Current Property Profile
+              </span>
+              <span className="text-xl font-bold tracking-tighter text-blue-500 uppercase">
+                {currentProperty.name} / {currentProperty.region}
+              </span>
+            </div>
             <div className="h-[1px] w-full bg-white/10" />
           </div>
 
@@ -78,13 +92,13 @@ export function RealEstateWelcome({ onStart, onGoHome }: WelcomeProps) {
       <section className="relative z-10 bg-black py-24 px-6 border-t border-white/5">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-light tracking-tight text-white/90 mb-6">
-            Ready to witness the <span className="font-bold text-blue-500">future</span> of Real Estate?
+            Ready to witness the <span className="font-bold text-blue-500">future</span> of {currentProperty.name}?
           </h2>
           <button
-            onClick={() => onStart('auto-tour')}
+            onClick={() => onStart('bird-view')}
             className="px-12 py-4 bg-white text-black font-black uppercase text-xs tracking-[0.3em] hover:bg-blue-600 hover:text-white transition-all duration-500 rounded-sm"
           >
-            Launch Experience
+            Launch 3D Bird's View
           </button>
         </div>
       </section>

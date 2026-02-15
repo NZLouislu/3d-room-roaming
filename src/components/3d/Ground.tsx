@@ -9,24 +9,36 @@ export const Ground = (props: JSX.IntrinsicElements['group']) => {
   return (
     <group {...props}>
       <RigidBody type="fixed" colliders="cuboid">
-        <mesh position={[0, -0.5, 0]} receiveShadow={performanceTier !== 'low'}>
-          <boxGeometry args={[150, 1, 150]} />
+        <mesh position={[0, -5, 0]} receiveShadow={performanceTier !== 'low'}>
+          <boxGeometry args={[500, 1, 500]} />
           {performanceTier === 'low' ? (
-             <meshBasicMaterial color="#5d9e58" />
+            <meshBasicMaterial
+              color="#5d9e58"
+              polygonOffset
+              polygonOffsetFactor={1}
+              polygonOffsetUnits={1}
+            />
           ) : (
-             <meshStandardMaterial color="#5d9e58" roughness={0.8} metalness={0.2} />
+            <meshStandardMaterial
+              color="#5d9e58"
+              roughness={0.8}
+              metalness={0.2}
+              polygonOffset
+              polygonOffsetFactor={1}
+              polygonOffsetUnits={1}
+            />
           )}
         </mesh>
       </RigidBody>
       {!isMobile && performanceTier === 'high' && (
         <ContactShadows
           opacity={0.4}
-          scale={80}
-          blur={1}
+          scale={100}
+          blur={2}
           far={10}
-          resolution={256}
+          resolution={1024}
           color="#000000"
-          position={[0, -0.49, 0]}
+          position={[0, -0.5, 0]}
         />
       )}
     </group>
