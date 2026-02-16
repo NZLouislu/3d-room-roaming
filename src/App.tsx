@@ -97,6 +97,7 @@ function AppImproved() {
   const [customLookAt, setCustomLookAt] = useState<[number, number, number] | undefined>();
 
   const [currentCameraPos, setCurrentCameraPos] = useState<[number, number, number]>([0, 28, -40]);
+  const [currentCameraLookAt, setCurrentCameraLookAt] = useState<[number, number, number]>([0, 0, 0]);
 
   const [rendererReady, setRendererReady] = useState(false);
   const { currentPropertyId, setRendererType, performanceTier, setPerformanceTier, setIsMobile, isMobile } = useStore();
@@ -172,7 +173,7 @@ function AppImproved() {
 
   const getCurrentLookAt = (): [number, number, number] => {
     if (customLookAt) return customLookAt;
-    return [0, 0, 0]; // Default or calculated fallback
+    return currentCameraLookAt;
   };
 
   return (
@@ -205,7 +206,7 @@ function AppImproved() {
           dpr={isMobile ? 1.0 : (performanceTier === 'low' ? 0.5 : (performanceTier === 'medium' ? [0.75, 1] : [1, 1.5]))}
           camera={{
             fov: 45,
-            near: 0.1,
+            near: 0.5,
             far: 2000,
           }}
           gl={{
@@ -270,7 +271,7 @@ function AppImproved() {
               customPosition={customPosition}
               customLookAt={customLookAt}
               onPositionChange={setCurrentCameraPos}
-              onLookAtChange={setCustomLookAt}
+              onLookAtChange={setCurrentCameraLookAt}
             />
           )}
 
