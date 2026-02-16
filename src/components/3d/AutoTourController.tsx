@@ -259,6 +259,8 @@ interface TourUIProps {
   isPaused: boolean;
   setIsPaused: (p: boolean) => void;
   onComplete: () => void;
+  currentPosition?: [number, number, number];
+  currentLookAt?: [number, number, number];
 }
 
 export function TourUI({
@@ -269,7 +271,9 @@ export function TourUI({
   setProgress,
   isPaused,
   setIsPaused,
-  onComplete
+  onComplete,
+  currentPosition,
+  currentLookAt
 }: TourUIProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const currentPoint = tourPoints[currentIndex];
@@ -329,13 +333,13 @@ export function TourUI({
           <h1 className="relative text-4xl font-black text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] tracking-tight">
             {currentIndex + 1}. {currentPoint.title}
           </h1>
-          <div className="text-white/80 text-sm font-medium mt-1 drop-shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
-            Click to controls
+          <div className="text-white/80 text-sm font-medium mt-1 drop-shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0 text-center">
+            Click to controls & coordinates
           </div>
         </div>
       ) : (
         <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-4 w-80 animate-in fade-in slide-in-from-left-4 duration-300">
-          <div className="flex items-start justify-between mb-4">
+          <div className="flex items-start justify-between mb-2">
             <div className="flex-1">
               <h3 className="text-xl font-bold text-gray-900 leading-tight">
                 {currentPoint.title}
@@ -358,13 +362,39 @@ export function TourUI({
             </button>
           </div>
 
-          <div className="flex items-center gap-3 mb-4 text-sm font-medium text-gray-500">
+          {/* Real-time Coordinates Display */}
+          {(currentPosition || currentLookAt) && (
+            <div className="mb-4 bg-gray-50 border border-gray-100 rounded-xl p-2.5 font-mono text-[10px] space-y-1">
+              <div className="flex justify-between items-center text-gray-400 uppercase tracking-tighter">
+                <span>Current Coordinates</span>
+                <span className="bg-blue-100 text-blue-600 px-1 rounded">LIVE</span>
+              </div>
+              {currentPosition && (
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Position:</span>
+                  <span className="text-blue-600 font-bold">
+                    [{currentPosition[0].toFixed(2)}, {currentPosition[1].toFixed(2)}, {currentPosition[2].toFixed(2)}]
+                  </span>
+                </div>
+              )}
+              {currentLookAt && (
+                <div className="flex justify-between border-t border-gray-100 pt-1">
+                  <span className="text-gray-400">LookAt:</span>
+                  <span className="text-purple-600 font-bold">
+                    [{currentLookAt[0].toFixed(2)}, {currentLookAt[1].toFixed(2)}, {currentLookAt[2].toFixed(2)}]
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="flex items-center gap-3 mb-3 text-sm font-medium text-gray-500">
             <span className="bg-gray-100 px-2 py-1 rounded">
               View {currentIndex + 1} of {tourPoints.length}
             </span>
           </div>
 
-          <div className="w-full bg-gray-100 rounded-full h-1.5 mb-6 overflow-hidden">
+          <div className="w-full bg-gray-100 rounded-full h-1.5 mb-5 overflow-hidden">
             <div
               className="bg-blue-600 h-full rounded-full transition-all duration-100 ease-linear"
               style={{ width: `${(progress / currentPoint.duration) * 100}%` }}

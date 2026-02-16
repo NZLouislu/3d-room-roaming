@@ -113,35 +113,43 @@ function AppImproved() {
     });
   }, [setRendererType, setPerformanceTier, setIsMobile]);
 
+  const setIsTouring = useStore(state => state.setIsTouring);
+
   const handleToggleBirdView = () => {
     if (mode === 'bird-view') {
-      setMode('free-explore');
+      setMode('welcome');
+      setTourEnabled(false);
+      setIsTouring(false);
     } else {
       setMode('bird-view');
       setTourEnabled(false);
+      setIsTouring(false);
+      setDebugMode(false);
     }
   };
 
-  const handleWelcomeChoice = (choice: 'auto-tour' | 'free-explore' | 'bird-view') => {
-    setMode(choice);
-    if (choice === 'auto-tour') {
+  const handleWelcomeChoice = (m: 'auto-tour' | 'free-explore' | 'bird-view') => {
+    setMode(m);
+    if (m === 'auto-tour') {
       setTourEnabled(true);
+      setIsTouring(true);
       setTourIndex(0);
       setTourProgress(0);
-      setTourPaused(false);
-      setDebugMode(false);
     }
   };
 
   const handleGoHome = () => {
     setMode('welcome');
     setTourEnabled(false);
-    setDebugMode(false);
+    setIsTouring(false);
+    setTourIndex(0);
+    setTourProgress(0);
   };
 
   const handleTourComplete = () => {
     setMode('bird-view');
     setTourEnabled(false);
+    setIsTouring(false);
     setDebugMode(false);
   };
 
@@ -316,6 +324,8 @@ function AppImproved() {
           isPaused={tourPaused}
           setIsPaused={setTourPaused}
           onComplete={handleTourComplete}
+          currentPosition={currentCameraPos}
+          currentLookAt={customLookAt}
         />
       )}
 

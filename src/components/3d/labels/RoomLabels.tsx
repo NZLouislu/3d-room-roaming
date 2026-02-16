@@ -6,8 +6,12 @@ export const RoomLabels = () => {
     const currentPropertyId = useStore((state) => state.currentPropertyId);
 
     const property = PROPERTY_LIST.find(p => p.id === currentPropertyId);
+    const isTouring = useStore((state) => state.isTouring);
 
-    if (!property || !property.roomLabels) return null;
+    // Don't render visual labels for the demo house (classic two-story) 
+    // to avoid cluttering the exterior view. They remain available for Quick Navigation.
+    // Also, hide ALL labels during immersive tours per user request.
+    if (!property || !property.roomLabels || currentPropertyId === 'demo-house' || isTouring) return null;
 
     return (
         <group>

@@ -38,14 +38,14 @@ export const PROPERTY_LIST: PropertyConfig[] = [
         description: 'A professional two-story architectural demo house.',
         tourPoints: DOUBLE_FLOOR_HOUSE_TOUR,
         roomLabels: [
-            { id: 'ext-backyard', name: 'Backyard Deck', position: [146, 12, 140] },
-            { id: 'ext-garage', name: 'Garage Entrance', position: [155, 12, 145] },
-            { id: 'int-foyer', name: 'Entrance Foyer', position: [150, 16, 145] },
-            { id: 'int-living', name: 'Main Living Room', position: [155, 16, 148] },
-            { id: 'int-kitchen', name: 'Modern Kitchen', position: [158, 16, 155] },
-            { id: 'int-master', name: 'Master Suite', position: [145, 16, 148] },
-            { id: 'int-bath', name: 'Master Bathroom', position: [165, 16, 160] },
-            { id: 'int-bed2', name: 'Guest Bedroom', position: [140, 16, 145] }
+            { id: 'ext-backyard', name: 'Backyard Deck', position: [5.07, 13.47, -14.25] },
+            { id: 'ext-garage', name: 'Garage Entrance', position: [6.25, 12.26, -5.86] },
+            { id: 'int-foyer', name: 'Entrance Foyer', position: [0, 16, -5] },
+            { id: 'int-living', name: 'Main Living Room', position: [3.42, 14.98, 8.63] },
+            { id: 'int-kitchen', name: 'Modern Kitchen', position: [3.15, 15.69, 11.79] },
+            { id: 'int-master', name: 'Master Suite', position: [13.0, 15.46, 8.12] },
+            { id: 'int-bath', name: 'Master Bathroom', position: [20.17, 15.08, 11.84] },
+            { id: 'int-bed2', name: 'Guest Bedroom', position: [12.78, 14.97, 7.99] }
         ]
     },
     {

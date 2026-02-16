@@ -22,6 +22,8 @@ interface State {
   setPanMode: (mode: boolean) => void;
   teleportTarget: [number, number, number] | null;
   setTeleportTarget: (target: [number, number, number] | null) => void;
+  isTouring: boolean;
+  setIsTouring: (isTouring: boolean) => void;
 }
 
 export const useStore = create<State>((set) => ({
@@ -45,4 +47,6 @@ export const useStore = create<State>((set) => ({
   setPanMode: (mode) => set({ panMode: mode }),
   teleportTarget: null,
   setTeleportTarget: (target) => set({ teleportTarget: target }),
+  isTouring: false,
+  setIsTouring: (isTouring) => set({ isTouring }),
 }));
