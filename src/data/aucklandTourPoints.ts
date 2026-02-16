@@ -3,24 +3,24 @@ import { TourPoint } from './tourPoints';
 export const AUCKLAND_NORTHCROSS_TOUR: TourPoint[] = [
     {
         id: 1,
-        position: [-6.00, 0.45, -3.00],
-        lookAt: [-12.57, 0.45, -2.86],
+        position: [-2.81, 0.08, -3.17],
+        lookAt: [-12.53, -2.22, -3.62],
         duration: 4,
         title: "Living Room",
         description: "Spacious main living area with modern furnishings."
     },
     {
         id: 2,
-        position: [-2.00, 0.45, -3.00],
-        lookAt: [0.20, 0.45, -3.50],
+        position: [1.06, -0.20, -2.22],
+        lookAt: [-4.96, -2.94, -9.72],
         duration: 4,
         title: "Child Bedroom",
         description: "Cozy child bedroom with peaceful ambiance."
     },
     {
         id: 3,
-        position: [1.00, 0.65, -3.00],
-        lookAt: [2.60, 0.65, -3.50],
+        position: [1.07, -0.20, -2.22],
+        lookAt: [-3.80, -2.60, -10.60],
         duration: 4,
         title: "Guest Bedroom",
         description: "Comfortable guest room for visiting family and friends."
