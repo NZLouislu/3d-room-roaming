@@ -53,31 +53,44 @@ export function AucklandHouse(props: JSX.IntrinsicElements['group']) {
             canvas.height = 512;
             const ctx = canvas.getContext('2d')!;
 
-            // 1. Base Wood Color (Warm Timber)
-            ctx.fillStyle = '#8b5a2b';
-            ctx.fillRect(0, 0, 512, 512);
+            // 1. Light Pine Wood Palette (from new reference)
+            const colors = ['#e8d5b5', '#dfc7a1', '#f0e3cc', '#e4d2ae'];
+            const plankCount = 6; // Reduced count for wider planks
+            const plankHeight = 512 / plankCount;
 
-            // 2. Add Wood Grain (Planks)
-            ctx.strokeStyle = '#5d3a1a'; // Darker groove color
-            ctx.lineWidth = 4;
-            for (let i = 0; i < 512; i += 64) {
+            for (let i = 0; i < plankCount; i++) {
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.fillRect(0, i * plankHeight, 512, plankHeight); // Horizontal Planks
+
+                // 2. Add Wavy Wood Grain (Simulating the new photo)
+                ctx.globalAlpha = 0.15;
+                ctx.strokeStyle = '#8b5a2b';
+                ctx.lineWidth = 1.5;
+                for (let j = 0; j < 8; j++) { // More grain lines for wider surface
+                    ctx.beginPath();
+                    let yBase = i * plankHeight + (Math.random() * plankHeight);
+                    ctx.moveTo(0, yBase);
+                    for (let x = 0; x <= 512; x += 32) {
+                        ctx.lineTo(x, yBase + Math.sin(x * 0.05) * 8); // More pronounced wave
+                    }
+                    ctx.stroke();
+                }
+                ctx.globalAlpha = 1.0;
+            }
+
+            // 3. Add Horizontal Groove Lines (Wider gaps)
+            ctx.strokeStyle = '#6d4c2e';
+            ctx.lineWidth = 3;
+            for (let i = 0; i <= 512; i += plankHeight) {
                 ctx.beginPath();
                 ctx.moveTo(0, i);
                 ctx.lineTo(512, i);
                 ctx.stroke();
             }
 
-            // 3. Add some random grain noise
-            ctx.globalAlpha = 0.1;
-            for (let i = 0; i < 20; i++) {
-                ctx.fillStyle = '#3d2510';
-                ctx.fillRect(Math.random() * 512, Math.random() * 512, Math.random() * 200, 2);
-            }
-            ctx.globalAlpha = 1.0;
-
             const texture = new THREE.CanvasTexture(canvas);
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-            texture.repeat.set(2, 8); // Long planks
+            texture.repeat.set(1, 2); // Doubled the width (24 -> 12 planks total)
             return texture;
         };
 
@@ -136,9 +149,9 @@ export function AucklandHouse(props: JSX.IntrinsicElements['group']) {
                 if (z > 2.8 || name.includes('deck') || name.includes('patio')) {
                     node.material = new THREE.MeshStandardMaterial({
                         map: woodMap,
-                        color: '#b3722d', // Rich Golden wood
-                        roughness: 0.7,
-                        metalness: 0.1,
+                        color: '#d2bda0', // Natural weathered wood tint
+                        roughness: 0.8,
+                        metalness: 0,
                         side: THREE.DoubleSide
                     });
                 }
