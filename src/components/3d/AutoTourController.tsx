@@ -274,32 +274,43 @@ export function TourUI({
   const [isExpanded, setIsExpanded] = useState(false);
   const currentPoint = tourPoints[currentIndex];
 
+  // Safety check: if currentPoint is undefined (e.g. during property switch), return null
+  if (!currentPoint) return null;
+
   // Check if tour is finished
   const isFinished = currentIndex === tourPoints.length - 1 && progress >= currentPoint.duration;
 
   if (isFinished) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-        <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl transform transition-all scale-100">
-          <h2 className="text-3xl font-black text-gray-900 mb-2">Tour Complete!</h2>
-          <p className="text-gray-600 mb-8">You've seen all the highlights. What would you like to do next?</p>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md">
+        <div className="bg-white/90 backdrop-blur-xl rounded-[2.5rem] p-10 max-w-md w-full text-center shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/20 transform transition-all scale-100">
+          <div className="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="text-4xl text-blue-600">🎉</span>
+          </div>
+          <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">Tour Complete!</h2>
+          <p className="text-gray-600 mb-8 font-medium">You've seen all the highlights. How would you like to continue your exploration?</p>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             <button
               onClick={() => {
                 setCurrentIndex(() => 0);
                 setProgress(0);
                 setIsPaused(false);
               }}
-              className="w-full py-3 px-6 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition"
+              className="w-full py-4 px-6 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 active:scale-[0.98] transition-all shadow-[0_10px_20px_rgba(37,99,235,0.3)] flex items-center justify-center gap-3"
             >
-              🔄 Replay Tour
+              <span className="text-xl">🔄</span>
+              <span>Replay Guided Tour</span>
             </button>
             <button
-              onClick={onComplete}
-              className="w-full py-3 px-6 bg-white text-gray-900 border-2 border-gray-200 font-bold rounded-xl hover:bg-gray-50 transition"
+              onClick={() => {
+                // We need to set mode to bird-view which is in parent state
+                onComplete(); // This normally sets to free-explore
+              }}
+              className="w-full py-4 px-6 bg-white/50 text-gray-900 border-2 border-gray-100 font-bold rounded-2xl hover:bg-gray-50 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
             >
-              🦅 Free Explore
+              <span className="text-xl">🦅</span>
+              <span>Bird's Eye View</span>
             </button>
           </div>
         </div>
@@ -308,7 +319,7 @@ export function TourUI({
   }
 
   return (
-    <div className="fixed top-24 left-6 z-40 pointer-events-auto">
+    <div className="fixed top-32 left-8 z-40 pointer-events-auto">
       {!isExpanded ? (
         <div
           className="group relative cursor-pointer"
@@ -364,8 +375,8 @@ export function TourUI({
             <button
               onClick={() => setIsPaused(!isPaused)}
               className={`w-full px-4 py-3 text-white text-sm font-bold rounded-xl transition shadow-sm flex items-center justify-center gap-2 ${isPaused
-                  ? 'bg-blue-600 hover:bg-blue-700 active:scale-[0.98]'
-                  : 'bg-orange-500 hover:bg-orange-600 active:scale-[0.98]'
+                ? 'bg-blue-600 hover:bg-blue-700 active:scale-[0.98]'
+                : 'bg-orange-500 hover:bg-orange-600 active:scale-[0.98]'
                 }`}
             >
               {isPaused ? (

@@ -13,8 +13,27 @@ interface BirdViewControlsProps {
 export const BirdViewControls = ({ isActive }: BirdViewControlsProps) => {
   const { camera, gl } = useThree();
   const controlsRef = useRef<any>(null);
-  const { setBirdViewCoords, panMode, currentPropertyId } = useStore();
+  const { setBirdViewCoords, panMode, currentPropertyId, teleportTarget, setTeleportTarget } = useStore();
   const currentProperty = PROPERTY_LIST.find(p => p.id === currentPropertyId) || PROPERTY_LIST[0];
+
+  // Handle Teleportation logic
+  useEffect(() => {
+    if (teleportTarget && controlsRef.current) {
+      const target = new THREE.Vector3(...teleportTarget);
+
+      // Move controls target to the room center
+      controlsRef.current.target.lerp(target, 1); // For now snap, but we can animate
+
+      // Position camera at a good viewing offset from the room center
+      // 1.5m height, 5m away
+      camera.position.set(target.x, target.y + 2.5, target.z + 5);
+
+      controlsRef.current.update();
+
+      // Reset target so it doesn't trigger again
+      setTeleportTarget(null);
+    }
+  }, [teleportTarget, camera, setTeleportTarget]);
 
   useEffect(() => {
     if (isActive) {

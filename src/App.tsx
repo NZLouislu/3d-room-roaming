@@ -140,7 +140,7 @@ function AppImproved() {
   };
 
   const handleTourComplete = () => {
-    setMode('free-explore');
+    setMode('bird-view');
     setTourEnabled(false);
     setDebugMode(false);
   };

@@ -36,7 +36,17 @@ export const PROPERTY_LIST: PropertyConfig[] = [
         initialLookAt: [150, 14, 145],
         materialStyle: 'minimalist',
         description: 'A professional two-story architectural demo house.',
-        tourPoints: DOUBLE_FLOOR_HOUSE_TOUR
+        tourPoints: DOUBLE_FLOOR_HOUSE_TOUR,
+        roomLabels: [
+            { id: 'ext-backyard', name: 'Backyard Deck', position: [146, 12, 140] },
+            { id: 'ext-garage', name: 'Garage Entrance', position: [155, 12, 145] },
+            { id: 'int-foyer', name: 'Entrance Foyer', position: [150, 16, 145] },
+            { id: 'int-living', name: 'Main Living Room', position: [155, 16, 148] },
+            { id: 'int-kitchen', name: 'Modern Kitchen', position: [158, 16, 155] },
+            { id: 'int-master', name: 'Master Suite', position: [145, 16, 148] },
+            { id: 'int-bath', name: 'Master Bathroom', position: [165, 16, 160] },
+            { id: 'int-bed2', name: 'Guest Bedroom', position: [140, 16, 145] }
+        ]
     },
     {
         id: 'auckland-northcross',

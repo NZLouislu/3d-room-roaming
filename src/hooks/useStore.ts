@@ -20,6 +20,8 @@ interface State {
   setBirdViewCoords: (coords: { pos: [number, number, number], target: [number, number, number] }) => void;
   panMode: boolean;
   setPanMode: (mode: boolean) => void;
+  teleportTarget: [number, number, number] | null;
+  setTeleportTarget: (target: [number, number, number] | null) => void;
 }
 
 export const useStore = create<State>((set) => ({
@@ -41,4 +43,6 @@ export const useStore = create<State>((set) => ({
   setBirdViewCoords: (coords) => set({ birdViewCoords: coords }),
   panMode: false,
   setPanMode: (mode) => set({ panMode: mode }),
+  teleportTarget: null,
+  setTeleportTarget: (target) => set({ teleportTarget: target }),
 }));
