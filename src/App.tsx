@@ -167,18 +167,12 @@ function AppImproved() {
 
   const getCurrentPosition = (): [number, number, number] => {
     if (customPosition) return customPosition;
-    if (tourEnabled && currentTourPoints[tourIndex]) {
-      return currentTourPoints[tourIndex].position;
-    }
     return currentCameraPos;
   };
 
   const getCurrentLookAt = (): [number, number, number] => {
     if (customLookAt) return customLookAt;
-    if (tourEnabled && currentTourPoints[tourIndex]) {
-      return currentTourPoints[tourIndex].lookAt;
-    }
-    return [0, 0, 0];
+    return [0, 0, 0]; // Default or calculated fallback
   };
 
   return (
@@ -324,8 +318,8 @@ function AppImproved() {
           isPaused={tourPaused}
           setIsPaused={setTourPaused}
           onComplete={handleTourComplete}
-          currentPosition={currentCameraPos}
-          currentLookAt={customLookAt}
+          currentPosition={getCurrentPosition()}
+          currentLookAt={getCurrentLookAt()}
         />
       )}
 

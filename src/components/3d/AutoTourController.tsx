@@ -211,6 +211,14 @@ export function AutoTourController({
     camera.position.lerp(targetPos, delta * 2.5);
     camera.lookAt(targetLookAt);
 
+    // Update parent state for live coordinate board
+    if (onPositionChange) {
+      onPositionChange([camera.position.x, camera.position.y, camera.position.z]);
+    }
+    if (onLookAtChange) {
+      onLookAtChange([targetLookAt.x, targetLookAt.y, targetLookAt.z]);
+    }
+
     if (Math.floor(progress) !== Math.floor(progress + delta)) {
       const dist = camera.position.distanceTo(targetPos);
       console.log(`[AutoTour Debug] View #${currentPoint.id}: ${currentPoint.title}`);

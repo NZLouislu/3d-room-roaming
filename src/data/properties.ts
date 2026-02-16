@@ -23,6 +23,7 @@ export interface PropertyConfig {
     description: string;
     tourPoints: TourPoint[];
     roomLabels?: RoomLabel[];
+    birdViewHeight?: number;
 }
 
 export const PROPERTY_LIST: PropertyConfig[] = [
@@ -37,6 +38,7 @@ export const PROPERTY_LIST: PropertyConfig[] = [
         materialStyle: 'minimalist',
         description: 'A professional two-story architectural demo house.',
         tourPoints: DOUBLE_FLOOR_HOUSE_TOUR,
+        birdViewHeight: 45,
         roomLabels: [
             { id: 'ext-backyard', name: 'Backyard Deck', position: [5.07, 13.47, -14.25] },
             { id: 'ext-garage', name: 'Garage Entrance', position: [6.25, 12.26, -5.86] },
@@ -59,6 +61,7 @@ export const PROPERTY_LIST: PropertyConfig[] = [
         materialStyle: 'modern',
         description: 'A real-world interior scan of a residential property in Northcross, Auckland.',
         tourPoints: AUCKLAND_NORTHCROSS_TOUR,
+        birdViewHeight: 12,
         roomLabels: [
             // Top Row (Left to Right)
             { id: 'top-1', name: 'Living Room', position: [-4, 1.9, -2.5] },

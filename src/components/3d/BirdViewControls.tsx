@@ -38,7 +38,8 @@ export const BirdViewControls = ({ isActive }: BirdViewControlsProps) => {
   useEffect(() => {
     if (isActive) {
       const targetPos = new THREE.Vector3(...currentProperty.initialLookAt);
-      camera.position.set(targetPos.x, targetPos.y + 50, targetPos.z + 50);
+      const height = currentProperty.birdViewHeight || 50;
+      camera.position.set(targetPos.x, targetPos.y + height, targetPos.z + height);
       camera.lookAt(targetPos);
 
       if (controlsRef.current) {
