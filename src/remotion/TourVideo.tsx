@@ -3,7 +3,7 @@ import { useCurrentFrame, useVideoConfig } from 'remotion';
 import { useMemo } from 'react';
 import * as THREE from 'three';
 import { DOUBLE_FLOOR_HOUSE_TOUR } from '../data/tourPoints';
-import { Environment } from '../components/3d/Environment';
+import { EnvironmentSystem } from '../components/3d/Environment';
 import { Lighting } from '../components/3d/Lighting';
 import { Ground } from '../components/3d/Ground';
 import { Garden } from '../components/3d/garden/Garden';
@@ -65,7 +65,7 @@ const TourScene: React.FC = () => {
             <TourUpdate lookAt={lookAt} />
 
             <Physics debug={false}>
-                <Environment />
+                <EnvironmentSystem />
                 <Lighting />
                 <Ground position={[0, 0, 0]} scale={[100, 1, 100]} />
                 <DoubleFloorHouseWithSuspense />

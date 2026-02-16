@@ -1,7 +1,7 @@
 import { Player } from './Player';
 import { Furniture } from './Furniture';
 import { Lighting } from './Lighting';
-import { Environment } from './Environment';
+import { EnvironmentSystem } from './Environment';
 import { Ground } from './Ground';
 import { ModelManager } from './models/ModelManager';
 import { Garden } from './garden/Garden';
@@ -14,7 +14,7 @@ export const Experience = () => {
 
   return (
     <>
-      <Environment />
+      <EnvironmentSystem />
       <Lighting />
       <Ground />
       <ModelManager>
