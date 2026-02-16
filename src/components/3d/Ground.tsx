@@ -13,16 +13,16 @@ export const Ground = (props: JSX.IntrinsicElements['group']) => {
           <boxGeometry args={[500, 1, 500]} />
           {performanceTier === 'low' ? (
             <meshBasicMaterial
-              color="#5d9e58"
+              color="#1a1a1a" // Professional Dark Neutral
               polygonOffset
               polygonOffsetFactor={1}
               polygonOffsetUnits={1}
             />
           ) : (
             <meshStandardMaterial
-              color="#5d9e58"
-              roughness={0.8}
-              metalness={0.2}
+              color="#1a1a1a"
+              roughness={0.9}
+              metalness={0.1}
               polygonOffset
               polygonOffsetFactor={1}
               polygonOffsetUnits={1}

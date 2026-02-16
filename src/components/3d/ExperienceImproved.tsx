@@ -1,6 +1,6 @@
 import { Ground } from './Ground';
 import { Lighting } from './Lighting';
-import { Environment } from './Environment';
+import { EnvironmentSystem } from './Environment';
 import { PlayerImproved } from './PlayerImproved';
 import { PropertyModelManager } from './models/PropertyModelManager';
 import { RoomLabels } from './labels/RoomLabels';
@@ -14,7 +14,7 @@ export const ExperienceImproved = ({ viewMode = 'third-person', enablePlayer = t
   return (
     <>
       <Lighting />
-      <Environment />
+      <EnvironmentSystem />
       <Ground position={[0, 0, 0]} scale={[500, 1, 500]} />
       <PropertyModelManager />
       <RoomLabels />
