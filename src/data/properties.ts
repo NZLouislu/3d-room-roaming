@@ -24,6 +24,12 @@ export interface PropertyConfig {
     tourPoints: TourPoint[];
     roomLabels?: RoomLabel[];
     birdViewHeight?: number;
+    streetView?: {
+        lat: number;
+        lng: number;
+        heading: number;
+        pitch: number;
+    };
 }
 
 export const PROPERTY_LIST: PropertyConfig[] = [
@@ -79,7 +85,13 @@ export const PROPERTY_LIST: PropertyConfig[] = [
 
             // Extreme Bottom
             { id: 'patio', name: 'Covered Patio & Deck', position: [1.2, 1.5, 4] }
-        ]
+        ],
+        streetView: {
+            lat: -36.7068946,
+            lng: 174.7280595,
+            heading: 206.23,
+            pitch: 0
+        }
     }
 ];
 

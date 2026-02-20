@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as Cesium from "cesium";
 import { useStore } from "../../hooks/useStore";
 import { PROPERTY_LIST } from "../../data/properties";
+import { StreetViewModal } from "../ui/StreetViewModal";
 
 // Set Cesium Ion Access Token
 const ION_TOKEN = import.meta.env.VITE_CESIUM_ION_TOKEN;
@@ -21,6 +22,7 @@ export function CesiumScene({ onBack, onEnterInterior }: CesiumSceneProps) {
     const viewerRef = useRef<Cesium.Viewer | null>(null);
     const modelEntityRef = useRef<Cesium.Entity | null>(null);
     const [modelActive, setModelActive] = useState(false);
+    const [streetViewOpen, setStreetViewOpen] = useState(false);
 
     const currentPropertyId = useStore((state) => state.currentPropertyId);
     const property = PROPERTY_LIST.find(p => p.id === currentPropertyId) || PROPERTY_LIST[0];
@@ -178,6 +180,17 @@ export function CesiumScene({ onBack, onEnterInterior }: CesiumSceneProps) {
                                 ? 'Spatial Twin synchronization complete. Interior floorplan geometry successfully projected onto geospatial terrain.'
                                 : 'Awaiting manual confirmation for High-Fidelity property scan deployment.'}
                         </p>
+
+                        {/* New Street View Toggle */}
+                        {property.streetView && (
+                            <button
+                                onClick={() => setStreetViewOpen(true)}
+                                className="w-full mt-2 py-2.5 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 rounded-lg flex items-center justify-center gap-2 transition-all group pointer-events-auto"
+                            >
+                                <span className="text-xs group-hover:scale-110 transition-transform">📍</span>
+                                <span>External Street View</span>
+                            </button>
+                        )}
                     </div>
 
                     {!modelActive ? (
@@ -197,6 +210,19 @@ export function CesiumScene({ onBack, onEnterInterior }: CesiumSceneProps) {
                     )}
                 </div>
             </div>
+
+            {/* Street View Overlay Modal */}
+            {property.streetView && (
+                <StreetViewModal
+                    isOpen={streetViewOpen}
+                    onClose={() => setStreetViewOpen(false)}
+                    lat={property.streetView.lat}
+                    lng={property.streetView.lng}
+                    heading={property.streetView.heading}
+                    pitch={property.streetView.pitch}
+                    apiKey={GOOGLE_MAPS_API_KEY}
+                />
+            )}
         </div>
     );
 }
