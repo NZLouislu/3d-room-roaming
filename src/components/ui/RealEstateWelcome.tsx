@@ -4,7 +4,7 @@ import { useStore } from '../../hooks/useStore';
 import { PROPERTY_LIST } from '../../data/properties';
 
 interface WelcomeProps {
-  onStart: (mode: 'auto-tour' | 'free-explore' | 'bird-view') => void;
+  onStart: (mode: 'auto-tour' | 'free-explore' | 'bird-view' | 'digital-twin') => void;
   onGoHome: () => void;
 }
 
@@ -79,10 +79,10 @@ export function RealEstateWelcome({ onStart, onGoHome }: WelcomeProps) {
               badge="Core"
             />
             <FeatureCard
-              title="High Fidelity"
-              icon="🏢"
-              desc="Next-generation rendering using WebGL and React Three Fiber."
-              badge="UIX"
+              title="Spatial Twin"
+              icon="🌍"
+              desc="Global scale visualization using Google Photorealistic 3D Tiles."
+              badge="GIS"
             />
           </div>
         </div>
@@ -94,12 +94,20 @@ export function RealEstateWelcome({ onStart, onGoHome }: WelcomeProps) {
           <h2 className="text-3xl font-light tracking-tight text-white/90 mb-6">
             Ready to witness the <span className="font-bold text-blue-500">future</span> of {currentProperty.name}?
           </h2>
-          <button
-            onClick={() => onStart('bird-view')}
-            className="px-12 py-4 bg-white text-black font-black uppercase text-xs tracking-[0.3em] hover:bg-blue-600 hover:text-white transition-all duration-500 rounded-sm"
-          >
-            Launch 3D Bird's View
-          </button>
+          <div className="flex flex-wrap justify-center gap-4">
+            <button
+              onClick={() => onStart('bird-view')}
+              className="px-12 py-4 bg-white/10 text-white backdrop-blur-md border border-white/20 font-black uppercase text-xs tracking-[0.3em] hover:bg-white hover:text-black transition-all duration-500 rounded-sm"
+            >
+              🏠 Launch Interior Model
+            </button>
+            <button
+              onClick={() => onStart('digital-twin')}
+              className="px-12 py-4 bg-blue-600 text-white font-black uppercase text-xs tracking-[0.3em] hover:bg-blue-700 transition-all duration-500 rounded-sm shadow-[0_0_20px_rgba(37,99,235,0.4)]"
+            >
+              🌍 Launch Spatial Twin
+            </button>
+          </div>
         </div>
       </section>
 

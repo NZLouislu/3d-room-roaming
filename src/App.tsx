@@ -19,8 +19,9 @@ import { PerformanceHUD } from './components/ui/PerformanceHUD';
 import { detectRendererCapabilities } from './utils/rendererDetection';
 import { useStore } from './hooks/useStore';
 import NASAHeader from './Navbar';
+import { CesiumScene } from './components/3d/CesiumScene';
 
-type AppMode = 'welcome' | 'auto-tour' | 'free-explore' | 'bird-view';
+type AppMode = 'welcome' | 'auto-tour' | 'free-explore' | 'bird-view' | 'digital-twin';
 
 function PropertyViewManager() {
   const { camera } = useThree();
@@ -116,7 +117,7 @@ function AppImproved() {
 
   const setIsTouring = useStore(state => state.setIsTouring);
 
-  const handleToggleBirdView = () => {
+  const handleToggleInteriorModel = () => {
     if (mode === 'bird-view') {
       setMode('welcome');
       setTourEnabled(false);
@@ -129,7 +130,7 @@ function AppImproved() {
     }
   };
 
-  const handleWelcomeChoice = (m: 'auto-tour' | 'free-explore' | 'bird-view') => {
+  const handleWelcomeChoice = (m: 'auto-tour' | 'free-explore' | 'bird-view' | 'digital-twin') => {
     setMode(m);
     if (m === 'auto-tour') {
       setTourEnabled(true);
@@ -180,12 +181,23 @@ function AppImproved() {
     <>
       {/* Global NASA Style Header */}
       <NASAHeader
-        onStart={(m) => handleWelcomeChoice(m)}
+        onStart={(m) => handleWelcomeChoice(m as any)}
         onGoHome={handleGoHome}
       />
 
+      {mode === 'digital-twin' && (
+        <CesiumScene
+          onBack={handleGoHome}
+          onEnterInterior={() => handleWelcomeChoice('bird-view')}
+        />
+      )}
+
       {mode !== 'welcome' && (
-        <Navbar isBirdView={mode === 'bird-view'} onToggleBirdView={handleToggleBirdView} />
+        <Navbar
+          isInteriorMode={mode === 'bird-view'}
+          onToggleInterior={handleToggleInteriorModel}
+          onLaunchSpatialTwin={() => handleWelcomeChoice('digital-twin')}
+        />
       )}
 
       {mode === 'bird-view' && (

@@ -55,7 +55,7 @@ export const PROPERTY_LIST: PropertyConfig[] = [
         name: 'Auckland Northcross Rooms',
         region: 'Auckland',
         modelPath: '/models/Auckland Northcross rooms.glb',
-        coordinates: { lat: -36.723, lng: 174.745 },
+        coordinates: { lat: -36.7070589, lng: 174.727956 },
         initialPosition: [-5, 3, 5],
         initialLookAt: [0, 1.5, 0],
         materialStyle: 'modern',

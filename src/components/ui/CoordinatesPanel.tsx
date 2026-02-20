@@ -38,7 +38,7 @@ export const CoordinatesPanel = ({ visible }: CoordinatesPanelProps) => {
   return (
     <div className="absolute top-24 left-4 bg-black/80 text-white p-4 rounded-xl backdrop-blur-md shadow-2xl z-40 w-80 font-mono transition-all">
       <div className="text-xs text-gray-400 mb-2 uppercase tracking-wider font-bold text-center border-b border-white/10 pb-2">
-        🏠 Bird View Toolset
+        🗺️ Interior Toolset
       </div>
 
       <div className="space-y-3 mt-3">

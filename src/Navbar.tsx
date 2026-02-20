@@ -3,7 +3,7 @@ import { PROPERTY_LIST } from "./data/properties";
 import { useStore } from "./hooks/useStore";
 
 interface HeaderProps {
-  onStart?: (mode: 'auto-tour' | 'free-explore' | 'bird-view') => void;
+  onStart?: (mode: 'auto-tour' | 'free-explore' | 'bird-view' | 'digital-twin') => void;
   onGoHome?: () => void;
 }
 
@@ -44,8 +44,14 @@ export default function Header({ onStart, onGoHome }: HeaderProps) {
           </nav>
         </div>
 
-        {/* Action Button (Start Tour) */}
-        <div className="hidden lg:flex items-center gap-4">
+        {/* Action Buttons */}
+        <div className="hidden lg:flex items-center gap-3">
+          <button
+            onClick={() => onStart?.('digital-twin')}
+            className="px-6 py-2.5 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/50 rounded-full text-[10px] font-black tracking-[0.2em] uppercase transition-all backdrop-blur-sm shadow-[0_0_15px_rgba(59,130,246,0.2)]"
+          >
+            Spatial Twin
+          </button>
           <button
             onClick={() => onStart?.('auto-tour')}
             className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-full text-[10px] font-black tracking-[0.2em] uppercase transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(59,130,246,0.3)]"
@@ -75,6 +81,12 @@ export default function Header({ onStart, onGoHome }: HeaderProps) {
             className="text-sm font-bold tracking-widest text-white text-left"
           >
             HOME
+          </button>
+          <button
+            onClick={() => { onStart?.('digital-twin'); setOpen(false); }}
+            className="w-full py-4 bg-white/5 text-white border border-white/10 font-black rounded-xl text-center text-[10px] tracking-[0.2em]"
+          >
+            SPATIAL TWIN
           </button>
           <button
             onClick={() => { onStart?.('auto-tour'); setOpen(false); }}
